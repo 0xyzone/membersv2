@@ -28,4 +28,22 @@ class UserTeam extends Model
     {
         return $this->belongsTo(Game::class);
     }
+
+    public function members()
+    {
+        return $this->belongsToMany(User::class, 'user_team_members')
+                    ->withPivot('role')
+                    ->withTimestamps();
+    }
+
+    // New relationship for invitations
+    public function invitations()
+    {
+        return $this->hasMany(Invitation::class);
+    }
+
+    public function scopeForGame($query, $gameId)
+    {
+        return $query->where('game_id', $gameId);
+    }
 }

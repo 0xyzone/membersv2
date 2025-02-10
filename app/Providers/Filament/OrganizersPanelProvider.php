@@ -32,6 +32,7 @@ class OrganizersPanelProvider extends PanelProvider
             ->path('organizers')
             ->login()
             ->registration()
+            ->databaseNotifications()
             ->colors([
                 'primary' => Color::Indigo,
             ])

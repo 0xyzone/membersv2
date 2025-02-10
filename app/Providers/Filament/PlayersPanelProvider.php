@@ -32,6 +32,7 @@ class PlayersPanelProvider extends PanelProvider
             ->path('players')
             ->login()
             ->registration()
+            ->databaseNotifications()
             ->colors([
                 'primary' => Color::Emerald,
             ])

@@ -26,6 +26,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     // Filament Setup
     public function getFilamentAvatarUrl(): ?string
     {
+        if(!$this->avatar_url){
+            return null;
+        }
         return asset('storage/' . $this->avatar_url);
     }
 
@@ -117,15 +120,22 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     {
         return $this->hasMany(UserGameInfo::class);
     }
-
-    /**
-     * Get all of the teams for the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function teams(): HasMany
+    
+    public function teams()
     {
-        return $this->hasMany(UserTeam::class);
+        return $this->belongsToMany(UserTeam::class, 'user_team_members')
+                    ->withPivot('role')
+                    ->withTimestamps();
+    }
+    public function ownedTeams()
+    {
+        return $this->hasMany(UserTeam::class, 'user_id');
+    }
+
+    // New relationship for sent invitations
+    public function sentInvitations()
+    {
+        return $this->hasMany(Invitation::class, 'sender_id');
     }
 
 }
