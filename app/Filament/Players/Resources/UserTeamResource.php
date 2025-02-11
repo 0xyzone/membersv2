@@ -394,6 +394,15 @@ class UserTeamResource extends Resource
                         $recipient = User::findOrFail($data['recipient_id']);
                         $sender = auth()->user();
 
+                        if (!$recipient->is_verified) {
+                            FilamentNotification::make()
+                                ->title('Unverified User')
+                                ->body("{$recipient->name} is not verified. Please ask them to verify their account first.")
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
                         // Validation: Prevent duplicate invitations
                         $existingInvitation = $team->invitations()
                             ->where('recipient_id', $recipient->id)

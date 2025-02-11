@@ -75,6 +75,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_verified' => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
     // public function getAvatarUrlAttribute(): string

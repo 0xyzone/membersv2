@@ -41,6 +41,15 @@ class EditUserTeam extends EditRecord
                     $recipient = User::findOrFail($data['recipient_id']);
                     $sender = auth()->user();
 
+                    if (!$recipient->is_verified) {
+                        FilamentNotification::make()
+                            ->title('Unverified User')
+                            ->body("{$recipient->name} is not verified. Please ask them to verify their account first.")
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+
                     // Existing validation logic
                     if (
                         $team->invitations()
@@ -56,6 +65,19 @@ class EditUserTeam extends EditRecord
                     }
                     if ($team->members()->where('user_team_members.user_id', $recipient->id)->exists()) {
                         FilamentNotification::make()->danger()->title('Already a member!')->send();
+                        return;
+                    }
+
+                    $isInSameGameTeam = $recipient->teams()
+                        ->where('game_id', $team->game_id)
+                        ->exists();
+
+                    if ($isInSameGameTeam) {
+                        FilamentNotification::make()
+                            ->title('User in Another Team')
+                            ->body("{$recipient->name} is already part of another team in this game")
+                            ->danger()
+                            ->send();
                         return;
                     }
 
