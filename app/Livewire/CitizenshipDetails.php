@@ -13,7 +13,7 @@ use Filament\Forms\Components\FileUpload;
 
 class CitizenshipDetails extends MyProfileComponent
 {
-    public array $only = ['citizenship_number', 'citizenship_issue_date', 'citizenship_image_path'];
+    public array $only = ['verification_document_number', 'verification_document_issue_date', 'verification_document_expiry_date', 'verification_document_image_path'];
     public array $data;
     public $user;
     public $userClass;
@@ -32,21 +32,29 @@ class CitizenshipDetails extends MyProfileComponent
     {
         return $form
             ->schema([
-                TextInput::make('citizenship_number')
+                TextInput::make('verification_document_number')
                     ->required()
                     ->unique(ignoreRecord: true),
-                DatePicker::make('citizenship_issue_date')
+                DatePicker::make('verification_document_issue_date')
                     ->required()
                     ->native(false)
                     ->displayFormat('d F Y')
                     ->weekStartsOnSunday()
                     ->closeOnDateSelection(),
-                FileUpload::make('citizenship_image_path')
-                    ->label('Citizenship Scanned Photo')
+                DatePicker::make('verification_document_expiry_date')
+                ->hint('If available')
+                    ->native(false)
+                    ->displayFormat('d F Y')
+                    ->weekStartsOnSunday()
+                    ->closeOnDateSelection(),
+                FileUpload::make('verification_document_image_path')
+                    ->label('Verfication Document Photo')
                     ->hint('Document should be properly scanned.')
                     ->image()
-                    ->directory('images/citizenships')
+                    ->directory('images/verification_documents')
                     ->required()
+                    ->moveFile()
+                    ->deletable()
             ])
             ->statePath('data');
     }

@@ -15,14 +15,16 @@ class TeamInvitationNotification extends Notification
 
     public $team;
     public $sender;
+    public $role;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct($team, $sender)
+    public function __construct($team, $sender, $role)
     {
         $this->team = $team;
         $this->sender = $sender;
+        $this->role = $role;
     }
 
     /**

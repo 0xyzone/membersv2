@@ -45,7 +45,6 @@ class PlayersPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Players/Widgets'), for: 'App\\Filament\\Players\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

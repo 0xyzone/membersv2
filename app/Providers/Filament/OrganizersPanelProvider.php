@@ -34,7 +34,7 @@ class OrganizersPanelProvider extends PanelProvider
             ->registration()
             ->databaseNotifications()
             ->colors([
-                'primary' => Color::Indigo,
+                'primary' => Color::Lime,
             ])
             ->viteTheme('resources/css/filament/organizers/theme.css')
             ->discoverResources(in: app_path('Filament/Organizers/Resources'), for: 'App\\Filament\\Organizers\\Resources')
@@ -45,7 +45,6 @@ class OrganizersPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Organizers/Widgets'), for: 'App\\Filament\\Organizers\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

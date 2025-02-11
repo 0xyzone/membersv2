@@ -1,4 +1,4 @@
-<x-filament-breezy::grid-section md=2 title="Citizenship Information" description="Fill in the necessary information in accordance to your document.">
+<x-filament-breezy::grid-section md=2 title="Verification Documnets" description="Fill in the necessary information in accordance to your submitting document.">
     <x-filament::card>
         <form wire:submit.prevent="submit" class="space-y-6">
 

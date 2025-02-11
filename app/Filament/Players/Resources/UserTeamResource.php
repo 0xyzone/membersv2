@@ -10,15 +10,22 @@ use Filament\Tables;
 use App\Models\UserTeam;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
+use App\Models\UserTeamMember;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\DB;
 use Filament\Forms\Components\Select;
 use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\Group;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
+use App\Notifications\TeamKickedNotification;
 use Filament\Infolists\Components\ImageEntry;
 use App\Notifications\TeamInvitationNotification;
+use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\RepeatableEntry;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Players\Resources\UserTeamResource\Pages;
@@ -55,28 +62,113 @@ class UserTeamResource extends Resource
             ->schema([
                 Section::make('Team Information')
                     ->schema([
-                        Grid::make(2)
+                        Grid::make(['md' => 2])
                             ->schema([
-                                TextEntry::make('id')->label('Team ID'),
-                                TextEntry::make('name')->label('Team Name'),
-                                TextEntry::make('short_name')->label('Short Name'),
-                                TextEntry::make('ingame_team_id')->label('In-Game Team ID'),
-                                TextEntry::make('game.name')->label('Game'),
-                                TextEntry::make('owner.name')->label('Owner'),
+                                Group::make([
+                                    ImageEntry::make('team_logo_image_path')
+                                        ->label('')
+                                        ->height(150)
+                                        ->width(150)
+                                        ->defaultImageUrl(asset('images/team_default.png'))
+                                        ->extraImgAttributes(['class' => 'rounded-lg shadow-md']),
+
+                                    TextEntry::make('short_name')
+                                        ->label('Team Short name')
+                                        ->size('lg')
+                                        ->weight('bold'),
+                                ])->columnSpan(['md' => 1]),
+
+                                Grid::make(1)
+                                    ->schema([
+                                        TextEntry::make('name')
+                                            ->label('Full Team Name')
+                                            ->size('lg')
+                                            ->weight('medium'),
+
+                                        Grid::make(2)
+                                            ->schema([
+                                                TextEntry::make('id')->label('Team ID'),
+                                                TextEntry::make('ingame_team_id')->label('Game Team ID'),
+                                                TextEntry::make('game.name')->label('Game')
+                                                    ->badge()
+                                                    ->color('primary'),
+                                                TextEntry::make('created_at')
+                                                    ->label('Created')
+                                                    ->dateTime('M d, Y'),
+                                            ]),
+                                    ])->columnSpan(['md' => 1]),
                             ]),
-                        ImageEntry::make('team_logo_image_path')->label('Team Logo'),
-                    ]),
+                    ])
+                    ->collapsible(),
+
+                Section::make('Team Leadership')
+                    ->schema([
+                        Grid::make(['md' => 2])
+                            ->schema([
+                                ImageEntry::make('owner.avatar_url')
+                                    ->label('Owner Avatar')
+                                    ->defaultImageUrl(asset('images/user_default.png'))
+                                    ->height(80)
+                                    ->width(80)
+                                    ->extraImgAttributes(['class' => 'rounded-full']),
+
+                                Group::make([
+                                    TextEntry::make('owner.name')
+                                        ->label('Owner Name')
+                                        ->size('lg'),
+
+                                    TextEntry::make('owner.email')
+                                        ->label('Contact Email')
+                                        ->icon('heroicon-o-envelope'),
+                                ]),
+                            ]),
+                    ])
+                    ->collapsible(),
 
                 Section::make('Team Members')
                     ->schema([
-                        RepeatableEntry::make('members')
+                        Grid::make(['md' => 2])
                             ->schema([
-                                TextEntry::make('name'),
-                                TextEntry::make('pivot.role')
-                                    ->label('Role'),
-                            ])
-                            ->columns(2),
-                    ]),
+                                RepeatableEntry::make('members')
+                                    ->schema([
+                                        Grid::make(2)
+                                            ->schema([
+                                                TextEntry::make('name')
+                                                    ->formatStateUsing(function ($state, $record) {
+                                                        $avatarUrl = $record->avatar_url ?? asset('images/user_default.png');
+                                                        return <<<HTML
+                                                        <div class="flex items-center gap-3">
+                                                            <img src="$avatarUrl" 
+                                                                class="h-8 w-8 rounded-full object-cover" 
+                                                                alt="User avatar"
+                                                            >
+                                                            <span class="font-medium">$state</span>
+                                                        </div>
+                                                    HTML;
+                                                    })
+                                                    ->html()
+                                                    ->columnSpan(1),
+
+                                                TextEntry::make('pivot.role')
+                                                    ->label('Role')
+                                                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                                                        'player' => 'Player',
+                                                        'substitue' => 'Substitute',
+                                                        default => Str::headline($state),
+                                                    })
+                                                    ->badge()
+                                                    ->color(fn(string $state): string => match ($state) {
+                                                        'player' => 'success',
+                                                        'substitue' => 'warning',
+                                                        default => 'gray',
+                                                    })
+                                                    ->columnSpan(1),
+                                            ]),
+                                    ])
+                                    ->columns(1),
+                            ])->columns(1),
+                    ])
+                    ->collapsible(),
             ]);
     }
 
@@ -125,7 +217,7 @@ class UserTeamResource extends Resource
                                 Forms\Components\Grid::make(2)
                                     ->schema([
                                         Forms\Components\TextInput::make('short_name')
-                                            ->maxLength(255)
+                                            ->maxLength(5)
                                             ->placeholder('Team abbreviation')
                                             ->helperText('Short version of team name (e.g., NYF)'),
 
@@ -142,6 +234,7 @@ class UserTeamResource extends Resource
                 Forms\Components\Section::make('Team Branding')
                     ->schema([
                         Forms\Components\FileUpload::make('team_logo_image_path')
+                            ->required()
                             ->image()
                             ->directory('team-logos') // Specify upload directory
                             ->avatar() // Makes it display as circular
@@ -153,7 +246,84 @@ class UserTeamResource extends Resource
                             ->imageResizeMode('cover')
                             ->imageCropAspectRatio('1:1'),
                     ])
-                    ->columns(1)
+                    ->columns(1),
+                Forms\Components\Section::make('Team Members')
+                    ->hidden(fn($record) => $record->members->count() == 0)
+                    // ->hiddenOn('create')
+                    ->schema([
+                        Forms\Components\Repeater::make('members')
+                            ->relationship('members')
+                            ->schema([
+                                Forms\Components\Select::make('user_id')
+                                    ->disabled()
+                                    ->label('Member')
+                                    ->options(User::query()->pluck('name', 'user_id'))
+                                    ->searchable()
+                                    ->required(),
+
+                                Forms\Components\Select::make('role')
+                                    ->disabled()
+                                    ->options([
+                                        'player' => 'Player',
+                                        'substitute' => 'Substitute',
+                                    ])
+                                    ->default('player')
+                                    ->required(),
+                            ])
+                            ->defaultItems(0)
+                            ->addable(false)
+                            ->deletable(false)
+                            ->columns(3) // Changed to 3 columns to accommodate the action
+                            ->columnSpanFull()
+                            ->extraItemActions([
+                                Forms\Components\Actions\Action::make('kick')
+                                    ->label('')
+                                    ->tooltip('Remove member immediately')
+                                    ->color('danger')
+                                    ->icon('heroicon-o-user-minus') // Changed to user-minus icon
+                                    ->requiresConfirmation()
+                                    ->modalHeading('Remove Team Member')
+                                    ->modalSubheading('This action will remove the member immediately!')
+                                    ->action(function (array $arguments, Forms\Components\Repeater $component) {
+                                        $state = $component->getState();
+                                        $index = $arguments['item'];
+                                        $userId = $state[$index]['id'];
+                                        // dd($userId);
+                                        $team = $component->getLivewire()->record;
+
+                                        // Use Eloquent relationship
+                                        $team->members()->detach($userId);
+
+                                        // Remove from form state
+                                        unset($state[$index]);
+                                        $component->state(array_values($state));
+
+                                        // Send notifications
+                                        $user = User::find($userId);
+                                        if ($user) {
+                                            $user->notify(new TeamKickedNotification($team, auth()->user()));
+                                            FilamentNotification::make()
+                                                ->title('Member Removed')
+                                                ->body("{$user->name} was removed immediately")
+                                                ->success()
+                                                ->send();
+                                        }
+                                    })
+                                    ->visible(function (array $arguments, Forms\Components\Repeater $component) {
+                                        $state = $component->getState();
+                                        $index = $arguments['item'];
+                                        return isset($state[$index]) &&
+                                            $state[$index]['user_id'] !== auth()->id();
+                                    })
+                            ])
+                            ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                                return $data;
+                            })
+                            ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                                return $data;
+                            })
+                    ])
+                    ->collapsible(),
             ]);
     }
 
@@ -196,7 +366,7 @@ class UserTeamResource extends Resource
                             ->options(User::where('id', '!=', auth()->id())->where('id', '!=', 1)->pluck('name', 'id')) // List of users to invite
                             ->searchable()
                             ->required(),
-                            Select::make('role')
+                        Select::make('role')
                             ->options([
                                 'player' => 'Player',
                                 'substitute' => 'Substitute',

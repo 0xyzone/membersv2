@@ -1,3 +1,20 @@
 @import '/vendor/filament/filament/resources/css/theme.css';
 
 @config 'tailwind.config.js';
+
+/* Improve table cell alignment */
+.filament-table td {
+    vertical-align: middle;
+}
+
+/* Add spacing between split columns */
+.filament-table-split {
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Compact badge styling */
+.filament-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}

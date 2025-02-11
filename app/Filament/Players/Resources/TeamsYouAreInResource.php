@@ -9,9 +9,9 @@ use Filament\Tables;
 use App\Models\UserTeam;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Infolists\Components\Table as InfoTable;
 use Filament\Forms\Components\Select;
 use Filament\Infolists\Components\Grid;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,9 +21,11 @@ use Filament\Infolists\Components\ImageEntry;
 use App\Notifications\TeamInvitationNotification;
 use Filament\Infolists\Components\RepeatableEntry;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Infolists\Components\Table as InfoTable;
 use App\Filament\Players\Resources\TeamsYouAreInResource\Pages;
 use Filament\Notifications\Notification as FilamentNotification;
 use App\Filament\Players\Resources\UserTeamResource\RelationManagers;
+use Filament\Infolists\Components\Group;
 
 class TeamsYouAreInResource extends Resource
 {
@@ -52,28 +54,113 @@ class TeamsYouAreInResource extends Resource
             ->schema([
                 Section::make('Team Information')
                     ->schema([
-                        Grid::make(2)
+                        Grid::make(['md' => 2])
                             ->schema([
-                                TextEntry::make('id')->label('Team ID'),
-                                TextEntry::make('name')->label('Team Name'),
-                                TextEntry::make('short_name')->label('Short Name'),
-                                TextEntry::make('ingame_team_id')->label('In-Game Team ID'),
-                                TextEntry::make('game.name')->label('Game'),
-                                TextEntry::make('owner.name')->label('Owner'),
+                                Group::make([
+                                    ImageEntry::make('team_logo_image_path')
+                                        ->label('')
+                                        ->height(150)
+                                        ->width(150)
+                                        ->defaultImageUrl(asset('images/team_default.png'))
+                                        ->extraImgAttributes(['class' => 'rounded-lg shadow-md']),
+
+                                    TextEntry::make('short_name')
+                                        ->label('Team Short name')
+                                        ->size('lg')
+                                        ->weight('bold'),
+                                ])->columnSpan(['md' => 1]),
+
+                                Grid::make(1)
+                                    ->schema([
+                                        TextEntry::make('name')
+                                            ->label('Full Team Name')
+                                            ->size('lg')
+                                            ->weight('medium'),
+
+                                        Grid::make(2)
+                                            ->schema([
+                                                TextEntry::make('id')->label('Team ID'),
+                                                TextEntry::make('ingame_team_id')->label('Game Team ID'),
+                                                TextEntry::make('game.name')->label('Game')
+                                                    ->badge()
+                                                    ->color('primary'),
+                                                TextEntry::make('created_at')
+                                                    ->label('Created')
+                                                    ->dateTime('M d, Y'),
+                                            ]),
+                                    ])->columnSpan(['md' => 1]),
                             ]),
-                        ImageEntry::make('team_logo_image_path')->label('Team Logo'),
-                    ]),
+                    ])
+                    ->collapsible(),
+
+                Section::make('Team Leadership')
+                    ->schema([
+                        Grid::make(['md' => 2])
+                            ->schema([
+                                ImageEntry::make('owner.avatar_url')
+                                    ->label('Owner Avatar')
+                                    ->defaultImageUrl(asset('images/user_default.png'))
+                                    ->height(80)
+                                    ->width(80)
+                                    ->extraImgAttributes(['class' => 'rounded-full']),
+
+                                Group::make([
+                                    TextEntry::make('owner.name')
+                                        ->label('Owner Name')
+                                        ->size('lg'),
+
+                                    TextEntry::make('owner.email')
+                                        ->label('Contact Email')
+                                        ->icon('heroicon-o-envelope'),
+                                ]),
+                            ]),
+                    ])
+                    ->collapsible(),
 
                 Section::make('Team Members')
                     ->schema([
-                        RepeatableEntry::make('members')
+                        Grid::make(['md' => 1])
                             ->schema([
-                                TextEntry::make('name'),
-                                TextEntry::make('pivot.role')
-                                ->label('Role'),
-                            ])
-                            ->columns(2),
-                    ]),
+                                RepeatableEntry::make('members')
+                                    ->schema([
+                                        Grid::make(2)
+                                            ->schema([
+                                                TextEntry::make('name')
+                                                    ->formatStateUsing(function ($state, $record) {
+                                                        $avatarUrl = $record->avatar_url ?? asset('images/user_default.png');
+                                                        return <<<HTML
+                                                        <div class="flex items-center gap-3">
+                                                            <img src="$avatarUrl" 
+                                                                class="h-8 w-8 rounded-full object-cover" 
+                                                                alt="User avatar"
+                                                            >
+                                                            <span class="font-medium">$state</span>
+                                                        </div>
+                                                    HTML;
+                                                    })
+                                                    ->html()
+                                                    ->columnSpan(1),
+
+                                                TextEntry::make('pivot.role')
+                                                    ->label('Role')
+                                                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                                                        'player' => 'Player',
+                                                        'substitue' => 'Substitute',
+                                                        default => Str::headline($state),
+                                                    })
+                                                    ->badge()
+                                                    ->color(fn(string $state): string => match ($state) {
+                                                        'player' => 'success',
+                                                        'substitue' => 'warning',
+                                                        default => 'gray',
+                                                    })
+                                                    ->columnSpan(1),
+                                            ]),
+                                    ])
+                                    ->columns(1),
+                            ])->columns(1),
+                    ])
+                    ->collapsible(),
             ]);
     }
 

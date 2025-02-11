@@ -20,22 +20,47 @@ class GameResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
     protected static ?string $activeNavigationIcon = 'heroicon-s-puzzle-piece';
 
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\FileUpload::make('image_path')
-                    ->image()
-                    ->directory('images/games/logos'),
-                Forms\Components\FileUpload::make('backdrop_image_path')
-                    ->image()
-                    ->directory('images/games/backdrops'),
-                Forms\Components\Toggle::make('is_active')
-                    ->required()
-                    ->default(true),
+                Forms\Components\Tabs::make('Game Details')
+                    ->tabs([
+                        Forms\Components\Tabs\Tab::make('General')
+                            ->schema([
+                                Forms\Components\Section::make('Basic Information')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+                                            ->label('Game Name')
+                                            ->required()
+                                            ->maxLength(255),
+                                        Forms\Components\Toggle::make('is_active')
+                                            ->label('Active Status')
+                                            ->required()
+                                            ->default(true),
+                                    ]),
+                            ]),
+
+                        Forms\Components\Tabs\Tab::make('Images')
+                            ->schema([
+                                Forms\Components\Section::make('Game Images')
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('image_path')
+                                            ->label('Logo Image')
+                                            ->image()
+                                            ->directory('images/games/logos'),
+                                        Forms\Components\FileUpload::make('backdrop_image_path')
+                                            ->label('Backdrop Image')
+                                            ->image()
+                                            ->directory('images/games/backdrops'),
+                                    ]),
+                            ]),
+                    ]),
             ]);
     }
 

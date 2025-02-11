@@ -9,10 +9,12 @@ use App\Models\Document;
 use App\Models\UserTeam;
 use Illuminate\Support\Str;
 use App\Models\UserGameInfo;
+use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Jeffgreco13\FilamentBreezy\Traits\TwoFactorAuthenticatable;
@@ -21,7 +23,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 {
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles, HasPanelShield;
 
     // Filament Setup
     public function getFilamentAvatarUrl(): ?string

@@ -51,7 +51,7 @@ class HandleInvitationAction extends Component
             $this->team->members()->attach($user->id, ['role' => $invitation->role]);
 
             // Update the invitation status
-            $invitation->update(['status' => 'accepted']);
+            $invitation->delete();
             $teamId = $this->team->id;
 
             $this->deleteNotificationForInvitation($user, $teamId);
