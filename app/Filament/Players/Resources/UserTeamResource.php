@@ -248,7 +248,7 @@ class UserTeamResource extends Resource
                     ])
                     ->columns(1),
                 Forms\Components\Section::make('Team Members')
-                    ->hidden(fn($record) => $record->members->count() == 0)
+                    ->hidden(fn($record) => $record ? $record->members->count() == 0 : true)
                     // ->hiddenOn('create')
                     ->schema([
                         Forms\Components\Repeater::make('members')
@@ -344,6 +344,23 @@ class UserTeamResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('ingame_team_id')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('members.name')
+                    ->label('Team Members')
+                    // ->formatStateUsing(function (UserTeam $record) {
+                    //     $members = $record->members->take(3);
+                    //     $memberNames = $members->pluck('name')->join(', ');
+
+                    //     $remaining = $record->members->count() - 3;
+                    //     $moreText = $remaining > 0 ? " +{$remaining} more" : '';
+
+                    //     return $memberNames . $moreText ?: 'No members';
+                    // })
+                    ->listWithLineBreaks()
+                    ->limitList(3)
+                    ->expandableLimitedList()
+                    ->badge()
+                    ->searchable(false)
+                    ->sortable(false),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -395,6 +412,20 @@ class UserTeamResource extends Resource
                         if ($team->members()->where('user_team_members.user_id', $recipient->id)->exists()) {
                             FilamentNotification::make()
                                 ->title('User is already a team!')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        // 3. NEW: Check if user is in any team for the same game
+                        $isInSameGameTeam = $recipient->teams()
+                            ->where('game_id', $team->game_id)
+                            ->exists();
+
+                        if ($isInSameGameTeam) {
+                            FilamentNotification::make()
+                                ->title('User in Another Team')
+                                ->body("{$recipient->name} is already part of another team in this game")
                                 ->danger()
                                 ->send();
                             return;
