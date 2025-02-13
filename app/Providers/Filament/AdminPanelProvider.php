@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Players\Widgets\VerificationWidget;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
@@ -47,6 +48,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
+                VerificationWidget::class
             ])
             ->middleware([
                 EncryptCookies::class,

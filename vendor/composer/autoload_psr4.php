@@ -45,6 +45,8 @@ return array(
     'Spatie\\LaravelPackageTools\\' => array($vendorDir . '/spatie/laravel-package-tools/src'),
     'Spatie\\Invade\\' => array($vendorDir . '/spatie/invade/src'),
     'Spatie\\Color\\' => array($vendorDir . '/spatie/color/src'),
+    'Schmeits\\FilamentCharacterCounter\\Database\\Factories\\' => array($vendorDir . '/schmeits/filament-character-counter/database/factories'),
+    'Schmeits\\FilamentCharacterCounter\\' => array($vendorDir . '/schmeits/filament-character-counter/src'),
     'RyanChandler\\BladeCaptureDirective\\Database\\Factories\\' => array($vendorDir . '/ryangjchandler/blade-capture-directive/database/factories'),
     'RyanChandler\\BladeCaptureDirective\\' => array($vendorDir . '/ryangjchandler/blade-capture-directive/src'),
     'Ramsey\\Uuid\\' => array($vendorDir . '/ramsey/uuid/src'),

@@ -13,7 +13,8 @@
         "jeffgreco13/filament-breezy": "^2.5",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "schmeits/filament-character-counter": "^1.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
