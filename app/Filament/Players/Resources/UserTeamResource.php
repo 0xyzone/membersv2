@@ -6,11 +6,13 @@ use Closure;
 use Filament\Forms;
 use App\Models\Game;
 use App\Models\User;
+use Filament\Forms\Components\Split;
 use Filament\Tables;
 use App\Models\UserTeam;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use App\Models\UserGameInfo;
 use App\Models\UserTeamMember;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -180,73 +182,102 @@ class UserTeamResource extends Resource
                 Forms\Components\Hidden::make('user_id')
                     ->default(auth()->id()),
 
-                // Main team information section
-                Forms\Components\Section::make('Team Information')
-                    ->schema([
-                        Forms\Components\Grid::make()
-                            ->schema([
-                                Forms\Components\Select::make('game_id')
-                                    ->relationship(
-                                        name: 'game',
-                                        titleAttribute: 'name',
-                                        modifyQueryUsing: fn(Builder $query) => $query->whereNotIn(
-                                            'id',
-                                            auth()->user()->ownedTeams()->pluck('game_id')
-                                                ->merge(auth()->user()->teams()->pluck('game_id'))
-                                                ->unique()
+                \Filament\Forms\Components\Group::make([
+                    // Team logo section
+                    Forms\Components\Section::make('Team Branding')
+                        ->schema([
+                            Forms\Components\FileUpload::make('team_logo_image_path')
+                                ->label('')
+                                ->required()
+                                ->image()
+                                ->directory('team-logos') // Specify upload directory
+                                ->avatar() // Makes it display as circular
+                                ->alignCenter()
+                                ->imageEditor()
+                                ->helperText('Recommended size: 1080x1080 pixels, PNG format')
+                                ->columnSpanFull()
+                                ->downloadable()
+                                ->imageResizeMode('cover')
+                                ->imageCropAspectRatio('1:1'),
+                        ])
+                        ->columns(1)
+                        ->columnSpan(1),
+                    // Main team information section
+                    Forms\Components\Section::make('Team Information')
+                        ->schema([
+                            Forms\Components\Grid::make()
+                                ->schema([
+                                    Forms\Components\Select::make('game_id')
+                                        ->relationship(
+                                            name: 'game',
+                                            titleAttribute: 'name',
+                                            modifyQueryUsing: fn(Builder $query) => $query
+                                                ->whereNotIn(
+                                                    'id',
+                                                    auth()->user()->ownedTeams()
+                                                        ->pluck('game_id')
+                                                        ->merge(auth()->user()->teams()->pluck('game_id'))
+                                                        ->unique()
+                                                )
+                                                // New condition: Only games with existing user game info
+                                                ->whereIn(
+                                                    'id',
+                                                    auth()->user()->userGameInfos()
+                                                        ->pluck('game_id')
+                                                )
                                         )
-                                    )
-                                    ->hiddenOn('edit')
-                                    ->required()
-                                    ->rules([
-                                        function () {
-                                            return function (string $attribute, $value, Closure $fail) {
-                                                if (auth()->user()->teams()->where('game_id', $value)->exists()) {
-                                                    $fail("You're already a member of a team in this game!");
-                                                }
-                                            };
-                                        },
-                                    ]),
+                                        ->hiddenOn('edit')
+                                        ->required()
+                                        ->helperText(function () {
+                                            $user = auth()->user();
 
-                                Forms\Components\TextInput::make('name')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->columnSpanFull()
-                                    ->placeholder('Enter team full name'),
+                                            // Get all game IDs where user has info but NO teams
+                                            $availableGameIds = $user->userGameInfos()
+                                                ->pluck('game_id')
+                                                ->diff(
+                                                    $user->ownedTeams()
+                                                        ->pluck('game_id')
+                                                        ->merge($user->teams()->pluck('game_id'))
+                                                        ->unique()
+                                                );
 
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\TextInput::make('short_name')
-                                            ->maxLength(5)
-                                            ->placeholder('Team abbreviation')
-                                            ->helperText('Short version of team name (e.g., NYF)'),
+                                            // Get actual game names
+                                            $availableGames = Game::whereIn('id', $availableGameIds)->pluck('name');
 
-                                        Forms\Components\TextInput::make('ingame_team_id')
-                                            ->maxLength(255)
-                                            ->placeholder('In-game identifier')
-                                            ->helperText('Team ID from the game system'),
-                                    ]),
-                            ])
-                    ])
-                    ->columns(1),
+                                            if ($availableGames->isEmpty()) {
+                                                return $user->userGameInfos()->exists()
+                                                    ? "You already have teams for all games you've added info to!"
+                                                    : "Add your game information first!";
+                                            }
 
-                // Team logo section
-                Forms\Components\Section::make('Team Branding')
-                    ->schema([
-                        Forms\Components\FileUpload::make('team_logo_image_path')
-                            ->required()
-                            ->image()
-                            ->directory('team-logos') // Specify upload directory
-                            ->avatar() // Makes it display as circular
-                            ->alignCenter()
-                            ->imageEditor()
-                            ->helperText('Recommended size: 1080x1080 pixels, PNG format')
-                            ->columnSpanFull()
-                            ->downloadable()
-                            ->imageResizeMode('cover')
-                            ->imageCropAspectRatio('1:1'),
-                    ])
-                    ->columns(1),
+                                            return "Available games: " . $availableGames->join(', ');
+                                        }),
+
+                                    Forms\Components\TextInput::make('name')
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->columnSpanFull()
+                                        ->placeholder('Enter team full name'),
+
+                                    Forms\Components\Grid::make(2)
+                                        ->schema([
+                                            Forms\Components\TextInput::make('short_name')
+                                                ->maxLength(5)
+                                                ->placeholder('Team abbreviation')
+                                                ->helperText('Short version of team name (e.g., NYF)'),
+
+                                            Forms\Components\TextInput::make('ingame_team_id')
+                                                ->maxLength(255)
+                                                ->placeholder('In-game identifier')
+                                                ->helperText('Team ID from the game system'),
+                                        ]),
+                                ])
+                        ])
+                        ->columns(1)
+                        ->columnSpan(2),
+                ])->columnSpanFull()->columns(3),
+
+
                 Forms\Components\Section::make('Team Members')
                     ->hidden(fn($record) => $record ? $record->members->count() == 0 : true)
                     // ->hiddenOn('create')
@@ -322,6 +353,53 @@ class UserTeamResource extends Resource
                             ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
                                 return $data;
                             })
+                    ])
+                    ->collapsible(),
+                // New Team Invitations Section
+                Forms\Components\Section::make('Team Invitations')
+                    ->hidden(fn($record) => $record ? $record->invitations->count() == 0 : true)
+                    ->schema([
+                        Forms\Components\Repeater::make('invitations')
+                            ->relationship('invitations')
+                            ->addable(false)
+                            ->schema([
+                                Forms\Components\Select::make('recipient_id')
+                                    ->label('Player')
+                                    ->options(User::where('id', '!=', auth()->id())->pluck('name', 'id'))
+                                    ->disabled()
+                                    ->searchable()
+                                    ->required(),
+
+                                Forms\Components\Select::make('role')
+                                    ->options([
+                                        'player' => 'Player',
+                                        'substitute' => 'Substitute',
+                                    ])
+                                    ->default('player')
+                                    ->disabled()
+                                    ->required(),
+
+                                Forms\Components\Select::make('status')
+                                    ->options([
+                                        'pending' => 'Pending',
+                                        'accepted' => 'Accepted',
+                                        'declined' => 'Declined',
+                                    ])
+                                    ->default('pending')
+                                    ->disabled()
+                                    ->required(),
+                            ])
+                            ->columns(3)
+                            ->columnSpanFull()
+                            ->addActionLabel('Add Invitation')
+                            ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                                $data['sender_id'] = auth()->id();
+                                return $data;
+                            })
+                            ->reorderable(false)
+                            ->deleteAction(
+                                fn(Forms\Components\Actions\Action $action) => $action->requiresConfirmation()
+                            )
                     ])
                     ->collapsible(),
             ]);
@@ -435,6 +513,38 @@ class UserTeamResource extends Resource
                             FilamentNotification::make()
                                 ->title('User in Another Team')
                                 ->body("{$recipient->name} is already part of another team in this game")
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        $hasGameInfo = UserGameInfo::where('user_id', $recipient->id)
+                            ->where('game_id', $team->game_id)
+                            ->exists();
+
+                        if (!$hasGameInfo) {
+                            FilamentNotification::make()
+                                ->title('Missing Game Information')
+                                ->body("{$recipient->name} must add their game info for this game first!")
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        // Check if recipient has ANY team association for this game
+                        $hasAnyTeamAssociation = UserTeam::where('game_id', $team->game_id)
+                            ->where(function ($query) use ($recipient) {
+                            $query->where('user_id', $recipient->id) // Teams they own
+                                ->orWhereHas('members', function ($q) use ($recipient) {
+                                    $q->where('user_team_members.user_id', $recipient->id); // Teams they're members of
+                                });
+                        })
+                            ->exists();
+
+                        if ($hasAnyTeamAssociation) {
+                            FilamentNotification::make()
+                                ->title('Team Conflict')
+                                ->body("{$recipient->name} is already associated with another team or has a team for their own for the game {$team->game->name}")
                                 ->danger()
                                 ->send();
                             return;

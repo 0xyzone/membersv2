@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use Jeffgreco13\FilamentBreezy\Livewire\MyProfileComponent;
+use App\Models\User;
 use Livewire\Component;
 use Filament\Forms\Form;
 use Filament\Facades\Filament;
@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Jeffgreco13\FilamentBreezy\Livewire\MyProfileComponent;
 
 class CitizenshipDetails extends MyProfileComponent
 {
@@ -31,10 +32,11 @@ class CitizenshipDetails extends MyProfileComponent
     public function form(Form $form): Form
     {
         return $form
+        ->model(User::class)
             ->schema([
                 TextInput::make('verification_document_number')
                     ->required()
-                    ->unique(ignoreRecord: true),
+                    ->unique(ignorable: $this->user),
                 DatePicker::make('verification_document_issue_date')
                     ->required()
                     ->native(false)

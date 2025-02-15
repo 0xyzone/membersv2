@@ -4,6 +4,8 @@ namespace App\Filament\Players\Resources\UserTeamResource\Pages;
 
 use App\Models\User;
 use Filament\Actions;
+use App\Models\UserTeam;
+use App\Models\UserGameInfo;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\EditRecord;
 use App\Notifications\TeamInvitationNotification;
@@ -50,24 +52,30 @@ class EditUserTeam extends EditRecord
                         return;
                     }
 
-                    // Existing validation logic
-                    if (
-                        $team->invitations()
-                            ->where('recipient_id', $recipient->id)
-                            ->whereIn('status', ['pending', 'accepted'])
-                            ->exists()
-                    ) {
+                    // Validation: Prevent duplicate invitations
+                    $existingInvitation = $team->invitations()
+                        ->where('recipient_id', $recipient->id)
+                        ->whereIn('status', ['pending', 'accepted'])
+                        ->exists();
+
+                    if ($existingInvitation) {
                         FilamentNotification::make()
                             ->title('Invitation already exists!')
                             ->danger()
                             ->send();
                         return;
                     }
+
+                    // Validation: Prevent inviting existing team members
                     if ($team->members()->where('user_team_members.user_id', $recipient->id)->exists()) {
-                        FilamentNotification::make()->danger()->title('Already a member!')->send();
+                        FilamentNotification::make()
+                            ->title('User is already a team!')
+                            ->danger()
+                            ->send();
                         return;
                     }
 
+                    // 3. NEW: Check if user is in any team for the same game
                     $isInSameGameTeam = $recipient->teams()
                         ->where('game_id', $team->game_id)
                         ->exists();
@@ -76,6 +84,38 @@ class EditUserTeam extends EditRecord
                         FilamentNotification::make()
                             ->title('User in Another Team')
                             ->body("{$recipient->name} is already part of another team in this game")
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+
+                    $hasGameInfo = UserGameInfo::where('user_id', $recipient->id)
+                        ->where('game_id', $team->game_id)
+                        ->exists();
+
+                    if (!$hasGameInfo) {
+                        FilamentNotification::make()
+                            ->title('Missing Game Information')
+                            ->body("{$recipient->name} must add their game info for this game first!")
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+
+                    // Check if recipient has ANY team association for this game
+                    $hasAnyTeamAssociation = UserTeam::where('game_id', $team->game_id)
+                        ->where(function ($query) use ($recipient) {
+                        $query->where('user_id', $recipient->id) // Teams they own
+                            ->orWhereHas('members', function ($q) use ($recipient) {
+                                $q->where('user_team_members.user_id', $recipient->id); // Teams they're members of
+                            });
+                    })
+                        ->exists();
+
+                    if ($hasAnyTeamAssociation) {
+                        FilamentNotification::make()
+                            ->title('Team Conflict')
+                            ->body("{$recipient->name} is already associated with another team or has a team for their own for the game {$team->game->name}")
                             ->danger()
                             ->send();
                         return;

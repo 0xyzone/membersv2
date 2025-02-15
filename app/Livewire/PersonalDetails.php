@@ -2,12 +2,13 @@
 
 namespace App\Livewire;
 
-use Filament\Forms\Components\Textarea;
+use App\Models\User;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
@@ -33,18 +34,17 @@ class PersonalDetails extends MyProfileComponent
     public function form(Form $form): Form
     {
         return $form
+            ->model(User::class)
             ->schema([
                 TextInput::make('username')
                     ->required()
-                    ->unique(ignoreRecord: true),
+                    ->unique(ignorable: $this->user),
                 TextInput::make('primary_contact_number')
-                    ->numeric()
-                    ->unique(ignoreRecord: true)
-                    ->required()
-                    ->maxLength(10),
+                    ->tel()
+                    ->unique(ignorable: $this->user)
+                    ->required(),
                 TextInput::make('secondary_contact_number')
-                    ->numeric()
-                    ->maxLength(10),
+                    ->tel(),
                 Textarea::make('permanent_address')
                     ->hint('Full Address written in your document.')
                     ->placeholder('Dallu Awas, Kathmandu, Nepal')
