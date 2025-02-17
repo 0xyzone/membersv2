@@ -7,6 +7,7 @@ use Filament\Panel;
 use App\Models\Social;
 use App\Models\Document;
 use App\Models\UserTeam;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Str;
 use App\Models\UserGameInfo;
 use Filament\Facades\Filament;
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Jeffgreco13\FilamentBreezy\Traits\TwoFactorAuthenticatable;
 
-class User extends Authenticatable implements FilamentUser, HasAvatar
+class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
