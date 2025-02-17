@@ -38,8 +38,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     {
         return match (true) {
             $this->hasRole('super_admin') => true,
-            $this->hasRole('organizer') => $panel->getId() === 'organizers',
-            $this->hasRole('player') => $panel->getId() === 'players',
+            $this->hasRole('organizers') => $panel->getId() === 'organizers',
+            $this->hasRole('players') => $panel->getId() === 'players',
             default => false,
         };
     }
