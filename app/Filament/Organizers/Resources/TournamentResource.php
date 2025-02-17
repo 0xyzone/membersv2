@@ -216,10 +216,10 @@ class TournamentResource extends Resource
                                             ->inline(),
 
                                         Forms\Components\TextInput::make('entry_fee')
-                                        ->helperText('0 = free entry')
-                                        ->numeric()
-                                        ->prefix('Rs. ')
-                                        ->default(0),
+                                            ->helperText('0 = free entry')
+                                            ->numeric()
+                                            ->prefix('Rs. ')
+                                            ->default(0),
                                         Forms\Components\Select::make('status')
                                             ->options([
                                                 'draft' => 'Draft',
@@ -278,6 +278,7 @@ class TournamentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn(Builder $query) => $query->where('user_id', auth()->user()->id))
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
