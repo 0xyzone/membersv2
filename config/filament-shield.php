@@ -30,6 +30,19 @@ return [
         'enabled' => true,
         'name' => 'players',
     ],
+    'panels' => [
+        'organizers' => [
+            'guard' => 'web',
+            'user_loader' => \App\Filament\Resources\UserResource::class,
+            'role' => 'organizers' // Explicitly set Shield's role for this panel
+        ],
+        'players' => [
+            'guard' => 'web',
+            'user_loader' => \App\Filament\Resources\UserResource::class,
+            'role' => 'players' // Explicitly set Shield's role for this panel
+        ],
+        // ... other panels
+    ],
 
     'organizer' => [
         'enabled' => true,
@@ -77,7 +90,8 @@ return [
         ],
 
         'widgets' => [
-            'AccountWidget', 'FilamentInfoWidget',
+            'AccountWidget',
+            'FilamentInfoWidget',
         ],
 
         'resources' => [],

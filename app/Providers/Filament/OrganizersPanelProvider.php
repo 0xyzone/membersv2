@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Events\Registered;
+use Filament\Events\Auth\Registered as FilamentRegistered;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;

@@ -9,6 +9,7 @@ use App\Models\Document;
 use App\Models\UserTeam;
 use Illuminate\Support\Str;
 use App\Models\UserGameInfo;
+use Filament\Facades\Filament;
 use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Notifications\Notifiable;
@@ -93,6 +94,25 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 
         static::creating(function ($model) {
             $model->user_id = Str::uuid();
+        });
+    }
+    protected static function booted(): void
+    {
+        static::created(function (User $user) {
+            // Clear existing roles first to prevent Shield's default assignment
+            $user->syncRoles([]);
+
+            // Get current panel ID from Filament context
+            $panelId = Filament::getCurrentPanel()?->getId();
+
+            // Assign role only for organizers panel registration
+            if ($panelId === 'organizers') {
+                $user->assignRole('organizers');
+            }
+
+            if ($panelId === 'players') {
+                $user->assignRole('players');
+            }
         });
     }
 

@@ -46,6 +46,76 @@ class UserResource extends Resource
         return static::getModel()::count();
     }
 
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Section::make('Personal Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('user_id')
+                            ->label('User ID')
+                            ->disabled()
+                            ->maxLength(36),
+                        Forms\Components\TextInput::make('name')
+                            ->label('Full Name')
+                            ->disabled(),
+                        Forms\Components\TextInput::make('username')
+                            ->label('Username')
+                            ->disabled(),
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email Address')
+                            ->disabled(),
+                        Forms\Components\DatePicker::make('date_of_birth')
+                            ->label('Date of Birth')
+                            ->disabled(),
+                        Forms\Components\TextInput::make('gender')
+                            ->label('Gender')
+                            ->disabled(),
+                    ]),
+
+                Forms\Components\Section::make('Verification Details')
+                    ->schema([
+                        Forms\Components\TextInput::make('verification_document_number')
+                            ->label('Document Number')
+                            ->disabled(),
+                        Forms\Components\DatePicker::make('verification_document_issue_date')
+                            ->label('Issue Date')
+                            ->disabled(),
+                        Forms\Components\DatePicker::make('verification_document_expiry_date')
+                            ->label('Expiry Date')
+                            ->disabled(),
+                        Forms\Components\FileUpload::make('verification_document_image_path')
+                            ->label('Document Image')
+                            ->disabled(),
+                    ]),
+
+                Forms\Components\Section::make('Account Settings')
+                    ->schema([
+                        Forms\Components\Select::make('roles')
+                            ->label('User Roles')
+                            ->relationship('roles', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->searchable(),
+                        Forms\Components\Toggle::make('is_verified')
+                            ->label('Verified User')
+                            ->required(),
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Active Status')
+                            ->required(),
+                        Forms\Components\DateTimePicker::make('email_verified_at')
+                            ->label('Email Verified At'),
+                    ]),
+
+                Forms\Components\Section::make('Profile Picture')
+                    ->schema([
+                        Forms\Components\FileUpload::make('avatar_url')
+                            ->label('Profile Picture')
+                            ->disabled(),
+                    ]),
+            ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
