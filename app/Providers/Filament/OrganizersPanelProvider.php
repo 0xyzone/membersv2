@@ -9,6 +9,7 @@ use Filament\PanelProvider;
 use App\Livewire\PersonalDetails;
 use Filament\Support\Colors\Color;
 use App\Livewire\CitizenshipDetails;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Validation\Rules\Password;
 use Filament\Http\Middleware\Authenticate;
@@ -36,7 +37,10 @@ class OrganizersPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Lime,
             ])
+            ->maxContentWidth(MaxWidth::Full)
+            ->sidebarFullyCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament/organizers/theme.css')
+            ->unsavedChangesAlerts()
             ->discoverResources(in: app_path('Filament/Organizers/Resources'), for: 'App\\Filament\\Organizers\\Resources')
             ->discoverPages(in: app_path('Filament/Organizers/Pages'), for: 'App\\Filament\\Organizers\\Pages')
             ->pages([

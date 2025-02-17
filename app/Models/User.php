@@ -28,7 +28,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     // Filament Setup
     public function getFilamentAvatarUrl(): ?string
     {
-        if(!$this->avatar_url){
+        if (!$this->avatar_url) {
             return null;
         }
         return asset('storage/' . $this->avatar_url);
@@ -124,12 +124,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     {
         return $this->hasMany(UserGameInfo::class);
     }
-    
+
     public function teams()
     {
         return $this->belongsToMany(UserTeam::class, 'user_team_members')
-                    ->withPivot('role')
-                    ->withTimestamps();
+            ->withPivot('role')
+            ->withTimestamps();
     }
     public function ownedTeams()
     {
@@ -142,4 +142,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->hasMany(Invitation::class, 'sender_id');
     }
 
+    public function tournamentRegistrations()
+    {
+        return $this->belongsToMany(TournamentRegistration::class, 'tournament_registration_players');
+    }
 }

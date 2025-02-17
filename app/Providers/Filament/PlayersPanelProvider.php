@@ -9,6 +9,7 @@ use Filament\PanelProvider;
 use App\Livewire\PersonalDetails;
 use Filament\Support\Colors\Color;
 use App\Livewire\CitizenshipDetails;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Validation\Rules\Password;
 use Filament\Http\Middleware\Authenticate;
@@ -36,7 +37,10 @@ class PlayersPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Emerald,
             ])
+            ->maxContentWidth(MaxWidth::Full)
+            ->sidebarFullyCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament/players/theme.css')
+            ->unsavedChangesAlerts()
             ->discoverResources(in: app_path('Filament/Players/Resources'), for: 'App\\Filament\\Players\\Resources')
             ->discoverPages(in: app_path('Filament/Players/Pages'), for: 'App\\Filament\\Players\\Pages')
             ->pages([

@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Players\Widgets\VerificationWidget;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
@@ -10,6 +9,7 @@ use Filament\PanelProvider;
 use App\Livewire\PersonalDetails;
 use Filament\Support\Colors\Color;
 use App\Livewire\CitizenshipDetails;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Validation\Rules\Password;
 use Filament\Http\Middleware\Authenticate;
@@ -17,6 +17,7 @@ use Jeffgreco13\FilamentBreezy\BreezyCore;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Filament\Http\Middleware\AuthenticateSession;
+use App\Filament\Players\Widgets\VerificationWidget;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Hydrat\TableLayoutToggle\TableLayoutTogglePlugin;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -39,7 +40,10 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Teal,
             ])
+            ->maxContentWidth(MaxWidth::Full)
+            ->sidebarFullyCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament/admin/theme.css')
+            ->unsavedChangesAlerts()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
