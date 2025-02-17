@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use App\Models\User;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Columns\Layout\Panel;
@@ -45,76 +46,6 @@ class UserResource extends Resource
         return static::getModel()::count();
     }
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Personal Information')
-                    ->schema([
-                        Forms\Components\TextInput::make('user_id')
-                            ->label('User ID')
-                            ->required()
-                            ->maxLength(36),
-                        Forms\Components\TextInput::make('name')
-                            ->label('Full Name')
-                            ->disabled(),
-                        Forms\Components\TextInput::make('username')
-                            ->label('Username')
-                            ->disabled(),
-                        Forms\Components\TextInput::make('email')
-                            ->label('Email Address')
-                            ->disabled(),
-                        Forms\Components\DatePicker::make('date_of_birth')
-                            ->label('Date of Birth')
-                            ->disabled(),
-                        Forms\Components\TextInput::make('gender')
-                            ->label('Gender')
-                            ->disabled(),
-                    ]),
-
-                Forms\Components\Section::make('Verification Details')
-                    ->schema([
-                        Forms\Components\TextInput::make('verification_document_number')
-                            ->label('Document Number')
-                            ->disabled(),
-                        Forms\Components\DatePicker::make('verification_document_issue_date')
-                            ->label('Issue Date')
-                            ->disabled(),
-                        Forms\Components\DatePicker::make('verification_document_expiry_date')
-                            ->label('Expiry Date')
-                            ->disabled(),
-                        Forms\Components\FileUpload::make('verification_document_image_path')
-                            ->label('Document Image')
-                            ->disabled(),
-                    ]),
-
-                Forms\Components\Section::make('Account Settings')
-                    ->schema([
-                        Forms\Components\Select::make('roles')
-                            ->label('User Roles')
-                            ->relationship('roles', 'name')
-                            ->multiple()
-                            ->preload()
-                            ->searchable(),
-                        Forms\Components\Toggle::make('is_verified')
-                            ->label('Verified User')
-                            ->required(),
-                        Forms\Components\Toggle::make('is_active')
-                            ->label('Active Status')
-                            ->required(),
-                        Forms\Components\DateTimePicker::make('email_verified_at')
-                            ->label('Email Verified At'),
-                    ]),
-
-                Forms\Components\Section::make('Profile Picture')
-                    ->schema([
-                        Forms\Components\FileUpload::make('avatar_url')
-                            ->label('Profile Picture')
-                            ->disabled(),
-                    ]),
-            ]);
-    }
-
     public static function table(Table $table): Table
     {
         return $table
@@ -130,6 +61,9 @@ class UserResource extends Resource
                         TextColumn::make('name')
                             ->weight('bold')
                             ->searchable()
+                            ->icon(fn($record) => $record->is_verified ? 'heroicon-s-check-badge' : 'heroicon-s-check-badge')
+                            ->iconColor(fn($record) => $record->is_verified ? 'info' : 'gray')
+                            ->iconPosition(IconPosition::After)
                             ->description(fn($record) => '@' . $record->username),
                         IconColumn::make('is_active')
                             ->grow(false)
