@@ -39,7 +39,7 @@ class OrganizersPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->emailVerification()
             ->colors([
-                'primary' => Color::Lime,
+                'primary' => Color::Blue,
             ])
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()

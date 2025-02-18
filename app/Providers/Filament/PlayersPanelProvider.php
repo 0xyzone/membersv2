@@ -37,7 +37,7 @@ class PlayersPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->emailVerification()
             ->colors([
-                'primary' => Color::Emerald,
+                'primary' => Color::Violet,
             ])
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()
