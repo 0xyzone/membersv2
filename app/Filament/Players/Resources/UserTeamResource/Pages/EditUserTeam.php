@@ -26,9 +26,14 @@ class EditUserTeam extends EditRecord
                 ->form([
                     Select::make('recipient_id')
                         ->label('User to invite')
-                        ->options(User::where('id', '!=', auth()->id())
-                            ->where('id', '!=', 1)
-                            ->pluck('name', 'id'))
+                        ->options(function () {
+                            return User::whereHas('roles', function ($query) {
+                                    $query->where('name', 'players');
+                                })
+                                ->where('id', '!=', auth()->id())
+                                ->where('id', '!=', 1)
+                                ->pluck('name', 'id');
+                        })
                         ->searchable()
                         ->required(),
                     Select::make('role')
