@@ -84,7 +84,6 @@ class TournamentResource extends Resource
                                             ->required()
                                             ->label('Cover Image')
                                             ->panelLayout('integrated')
-                                            ->removeUploadedFileButtonPosition('center')
                                             ->uploadButtonPosition('center')
                                             ->image()
                                             ->directory('tournaments/covers')
