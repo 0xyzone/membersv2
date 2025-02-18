@@ -56,7 +56,7 @@ class TournamentResource extends Resource
                     ->label('')
                     ->defaultImageUrl(asset('images/tournament_default.png'))
                     ->extraAttributes([
-                        'class' => 'lg:-mt-[350px] -mt-[120px] max-w-max aspect-square z-10 !h-max shadow-2xl'
+                        'class' => 'lg:-mt-[350px] -mt-[120px] lg:ml-4 max-w-max aspect-square z-10 !h-max shadow-2xl'
                     ])
                     ->extraImgAttributes([
                         'class' => '!w-28 lg:!w-40 aspect-square !h-auto bg-gray-800 p-4 rounded-lg border-4 border-gray-200'
