@@ -13,3 +13,6 @@ Route::get('/invitation/{team}/{action}', HandleInvitationAction::class)
     ->name('invitation.action');
 
 Route::post('/verify', [VerificationController::class, 'applyForVerification'])->name('verification.apply');
+Route::get('/check419', function () {
+    return view('errors.419');
+});
