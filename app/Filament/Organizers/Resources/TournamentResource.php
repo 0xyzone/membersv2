@@ -69,6 +69,7 @@ class TournamentResource extends Resource
                                     ->columns(2)
                                     ->schema([
                                         Forms\Components\FileUpload::make('logo_image_path')
+                                            ->required()
                                             ->label('Tournament Logo')
                                             ->helperText('Image should be atleast 1080 x 1080 pixels big and it should be in ratio of 1:1')
                                             ->image()
@@ -80,6 +81,7 @@ class TournamentResource extends Resource
                                             ->uploadButtonPosition('center'),
 
                                         Forms\Components\FileUpload::make('cover_image_path')
+                                            ->required()
                                             ->label('Cover Image')
                                             ->panelLayout('integrated')
                                             ->removeUploadedFileButtonPosition('center')
