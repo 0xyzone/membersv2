@@ -45,7 +45,6 @@ class TournamentResource extends Resource
             ->schema([
                 ImageEntry::make('cover_image_path')
                     ->label('')
-                    ->height(300)
                     ->columnSpanFull()
                     ->extraAttributes([
                         'class' => '!max-w-7xl !block mx-auto !lg:-mb-[200px]'
@@ -55,8 +54,6 @@ class TournamentResource extends Resource
                     ]),
                 ImageEntry::make('logo_image_path')
                     ->label('')
-                    ->height(150)
-                    ->width(150)
                     ->defaultImageUrl(asset('images/tournament_default.png'))
                     ->extraAttributes([
                         'class' => 'lg:-mt-[350px] -mt-[120px] max-w-max aspect-square z-10 !h-max shadow-2xl'

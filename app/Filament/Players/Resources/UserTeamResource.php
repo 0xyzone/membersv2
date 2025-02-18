@@ -137,7 +137,7 @@ class UserTeamResource extends Resource
                                             ->schema([
                                                 TextEntry::make('name')
                                                     ->formatStateUsing(function ($state, $record) {
-                                                        $avatarUrl = $record->avatar_url ?? asset('images/user_default.png');
+                                                        $avatarUrl = $record->avatar_url ? asset('/storage/' . $record->avatar_url) : asset('images/user_default.png');
                                                         return <<<HTML
                                                         <div class="flex items-center gap-3">
                                                             <img src="$avatarUrl" 
