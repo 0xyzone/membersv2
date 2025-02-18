@@ -177,7 +177,8 @@ class UserResource extends Resource
                             ->iconColor('primary')
                             ->copyable()
                             ->size('sm')
-                            ->color('medium_gray'),
+                            ->color('medium_gray')
+                            ->suffix(fn($record) => $record->hasVerifiedEmail() ? ' ✅' : ''),
                         TextColumn::make('current_address')
                             ->icon('heroicon-o-map-pin')
                             ->iconColor('primary')
