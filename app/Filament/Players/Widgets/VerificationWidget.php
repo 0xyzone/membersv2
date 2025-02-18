@@ -21,6 +21,15 @@ class VerificationWidget extends Widget
         $this->verificationStatus = KymVerification::where('user_id', $this->user->id)->first();
     }
 
+    public static function canView(): bool
+    {
+        // Get the currently authenticated user
+        $user = Auth::user();
+
+        // Check if the user is not verified
+        return $user && !$user->is_verified;
+    }
+
     public function applyForVerification()
     {
         $user = $this->user;
