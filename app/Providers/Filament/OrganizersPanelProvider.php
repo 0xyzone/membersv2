@@ -36,6 +36,7 @@ class OrganizersPanelProvider extends PanelProvider
             ->login()
             ->registration()
             ->databaseNotifications()
+            ->emailVerification()
             ->colors([
                 'primary' => Color::Lime,
             ])
