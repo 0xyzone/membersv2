@@ -2,11 +2,10 @@
 
 namespace App\Providers\Filament;
 
-use App\Events\Registered;
-use Filament\Events\Auth\Registered as FilamentRegistered;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
+use App\Events\Registered;
 use Filament\PanelProvider;
 use App\Livewire\PersonalDetails;
 use Filament\Support\Colors\Color;
@@ -22,9 +21,11 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Events\Auth\Registered as FilamentRegistered;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use SolutionForest\FilamentSimpleLightBox\SimpleLightBoxPlugin;
 
 class OrganizersPanelProvider extends PanelProvider
 {
@@ -68,6 +69,7 @@ class OrganizersPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
+                SimpleLightBoxPlugin::make(),
                 BreezyCore::make()
                     ->myProfile(
                         shouldRegisterUserMenu: true, // Sets the 'account' link in the panel User Menu (default = true)

@@ -70,7 +70,8 @@ class KymVerificationResource extends Resource
                     TextEntry::make('user.verification_document_number')->label('Document Number')->copyable(),
                     TextEntry::make('user.verification_document_issue_date')->label('Issue Date')->date(),
                     TextEntry::make('user.verification_document_expiry_date')->label('Expiry Date')->date()->hidden(fn ($record) => !$record->user->verification_document_expiry_date),
-                    ImageEntry::make('user.verification_document_image_path')->label('Document Image')->url(fn ($record) => asset($record->user->verification_document_image_path))->openUrlInNewTab(),
+                    ImageEntry::make('user.verification_document_image_path')->label('Document Image')->url(fn ($record) => asset($record->user->verification_document_image_path))->openUrlInNewTab()
+                    ->simpleLightbox(),
                 ]),
 
             Section::make('Account Information')
