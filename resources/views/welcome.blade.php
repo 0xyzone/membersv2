@@ -20,7 +20,37 @@
                 background-position: 0% 50%;
             }
         }
-
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+        .dropdown-enter {
+            animation: slideDown 0.3s ease forwards;
+        }
+        .dropdown-exit {
+            animation: slideUp 0.3s ease forwards;
+        }
+        .button-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(125, 60, 237, 0.4);
+            transition: all 0.3s ease;
+        }
         .arena-gradient {
             background: linear-gradient(135deg, #1a1b2d, #2d1a2d, #1a2d2d);
             background-size: 400% 400%;
@@ -45,7 +75,7 @@
 </head>
 <body class="bg-stone-950 text-stone-100 font-sans">
 
-    <!-- Navigation -->
+    <!-- Top Navigation -->
     <nav class="arena-gradient px-6 py-4 border-b-2 border-purple-500/30">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-4">
@@ -56,15 +86,53 @@
                 </div>
             </div>
             <div class="hidden md:flex items-center space-x-6">
-                <span class="text-sm text-purple-300">
-                    <i class="fas fa-users mr-1"></i>245K Competitors
-                </span>
-                <span class="text-sm text-blue-300">
-                    <i class="fas fa-trophy mr-1"></i>12K Tournaments
-                </span>
+                <a href="{{ route('filament.players.auth.login') }}" class="button-hover text-sm text-purple-300 bg-purple-800 py-4 px-6 rounded-lg transition-all">
+                    <i class="fas fa-users mr-1"></i>Login Players
+                </a>
+                <a href="{{ route('filament.organizers.auth.login') }}" class="button-hover text-sm text-blue-300 bg-blue-800 py-4 px-6 rounded-lg transition-all">
+                    <i class="fas fa-trophy mr-1"></i>Login Organizers
+                </a>
+            </div>
+            <div class="flex md:hidden items-center">
+                <button id="dropdownButton" class="text-sm text-purple-300 focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
+
+        <!-- Dropdown Menu -->
+        <div id="dropdownMenu" class="hidden md:hidden bg-gray-800 rounded-lg mt-2 overflow-hidden transition-all duration-300">
+            <a href="{{ route('filament.players.auth.login') }}" class="block text-sm text-purple-300 py-2 px-4 hover:bg-purple-700">
+                <i class="fas fa-users mr-1"></i>Login Players
+            </a>
+            <a href="{{ route('filament.organizers.auth.login') }}" class="block text-sm text-blue-300 py-2 px-4 hover:bg-blue-700">
+                <i class="fas fa-trophy mr-1"></i>Login Organizers
+            </a>
+        </div>
     </nav>
+
+    <script>
+        // JavaScript to toggle dropdown menu with animation
+        const dropdownButton = document.getElementById('dropdownButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        dropdownButton.addEventListener('click', () => {
+            if (dropdownMenu.classList.contains('hidden')) {
+                dropdownMenu.classList.remove('hidden');
+                dropdownMenu.classList.add('dropdown-enter');
+                dropdownMenu.classList.remove('dropdown-exit');
+            } else {
+                dropdownMenu.classList.add('dropdown-exit');
+                dropdownMenu.addEventListener('animationend', () => {
+                    dropdownMenu.classList.add('hidden');
+                    dropdownMenu.classList.remove('dropdown-enter', 'dropdown-exit');
+                }, {
+                    once: true
+                });
+            }
+        });
+
+    </script>
 
     <!-- Hero Section -->
     <section class="relative overflow-hidden min-h-[80vh] flex items-center">
