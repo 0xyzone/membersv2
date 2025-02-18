@@ -1,120 +1,138 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Session Expired - Stellar Timeout</title>
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+    <title>419 - Time Sands Expired</title>
+    @vite('resources/css/app.css')
     <style>
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
+        @keyframes sand-fall {
+            0% {
                 transform: translateY(-20px);
-            }
-        }
-
-        .animate-float {
-            animation: float 4s ease-in-out infinite;
-        }
-
-        .star {
-            animation: twinkle var(--duration) ease-in-out infinite;
-        }
-
-        @keyframes twinkle {
-
-            0%,
-            100% {
-                opacity: 0.3;
+                opacity: 0;
             }
 
             50% {
                 opacity: 1;
             }
+
+            100% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+        }
+
+        .sand-particle {
+            animation: sand-fall 2s linear infinite;
+        }
+
+        .hourglass-glow {
+            filter: drop-shadow(0 0 8px #f59e0b);
         }
 
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 min-h-screen text-white relative overflow-hidden">
-    <!-- Starry background -->
-    <div class="absolute inset-0 z-0" id="stars"></div>
-
-    <div class="container mx-auto px-4 min-h-screen flex flex-col items-center justify-center relative z-10">
-        <div class="max-w-2xl text-center space-y-6">
-            <!-- Animated Astronaut SVG -->
-            <svg class="w-64 h-64 mx-auto animate-float" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M100 25C115.464 25 128 37.5359 128 53C128 68.4641 115.464 81 100 81C84.5359 81 72 68.4641 72 53C72 37.5359 84.5359 25 100 25Z" fill="#F3F4F6" />
-                <path d="M116 136C116 136 124 128 124 108C124 88 108 84 100 84C92 84 76 88 76 108C76 128 84 136 84 136L116 136Z" fill="#3B82F6" />
-                <path d="M100 170C133.137 170 160 143.137 160 110C160 76.8629 133.137 50 100 50C66.8629 50 40 76.8629 40 110C40 143.137 66.8629 170 100 170Z" fill="#1D4ED8" />
-                <path d="M100 170L84 200H116L100 170Z" fill="#1E3A8A" />
-                <circle cx="88" cy="60" r="8" fill="#111827" />
-                <circle cx="112" cy="60" r="8" fill="#111827" />
-            </svg>
-
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-                🚀 Interstellar Session Timeout
-            </h1>
-
-            <p class="text-lg md:text-xl text-gray-200 leading-relaxed">
-                Our quantum entanglement link has dissolved into the cosmic background.<br>
-                To protect the space-time continuum, please re-establish your connection.
-            </p>
-
-            <div class="mt-8 space-y-4">
-                <a href="{{ back() }}" class="inline-block px-8 py-4 text-lg font-bold text-gray-900 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full transform transition-all hover:scale-105 hover:shadow-lg hover:shadow-yellow-400/30">
-                    ⚡ Re-Engage Warp Drive
-                </a>
-
-                <p class="text-sm text-gray-400 mt-4">
-                    Need help? Contact Mission Control at
-                    <a href="mailto:support@example.com" class="text-blue-400 hover:text-blue-300">
-                        support@example.com
-                    </a>
-                </p>
+<body class="bg-stone-900 text-stone-50 min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="max-w-2xl text-center space-y-8">
+        <!-- Ancient Hourglass -->
+        <div class="relative group" id="hourglass">
+            <div class="absolute inset-0 bg-amber-900/20 rounded-full blur-2xl opacity-0 group-hover:opacity-40 transition-opacity"></div>
+            <div class="relative p-8 bg-stone-800 rounded-3xl transition-transform duration-300 hover:scale-105 cursor-pointer">
+                <div class="relative w-32 h-32 mx-auto">
+                    <!-- Sand particles -->
+                    <div class="absolute inset-0 overflow-hidden">
+                        <div class="sand-particle absolute left-1/4 w-1 h-4 bg-amber-400" style="animation-delay: 0.2s"></div>
+                        <div class="sand-particle absolute left-2/4 w-1 h-4 bg-amber-300" style="animation-delay: 0.5s"></div>
+                        <div class="sand-particle absolute left-3/4 w-1 h-4 bg-amber-200" style="animation-delay: 0.8s"></div>
+                    </div>
+                    <!-- Hourglass SVG -->
+                    <svg class="w-full h-full hourglass-glow" id="hourglass-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path class="text-amber-600" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path class="text-amber-800" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                </div>
+                <div class="mt-4 text-amber-400 text-sm font-mono">CHRONOS BREACH</div>
             </div>
+        </div>
+
+        <!-- Error Content -->
+        <div class="space-y-4">
+            <h1 class="text-6xl font-bold text-amber-500">419</h1>
+            <h2 class="text-3xl font-semibold">Sands of Time Depleted</h2>
+            <p class="text-stone-400 text-lg">
+                The arena's temporal gateway has collapsed.<br>
+                Even the most patient strategists can't outwait this ancient mechanism!
+            </p>
+        </div>
+
+        <!-- Interactive Elements -->
+        <div class="grid md:grid-cols-2 gap-4 mt-8">
+            <a href="{{ url('/') }}" class="p-4 bg-stone-800 hover:bg-stone-700 rounded-lg transition-all group">
+                <div class="flex items-center justify-center space-x-2">
+                    <svg class="w-6 h-6 text-amber-400 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span>Return to Present Era</span>
+                </div>
+            </a>
+            <button onclick="rechargeTime()" class="p-4 bg-stone-800 hover:bg-amber-900/50 rounded-lg transition-all group">
+                <div class="flex items-center justify-center space-x-2">
+                    <svg class="w-6 h-6 text-orange-400 group-hover:animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Recharge Temporal Sands</span>
+                </div>
+            </button>
+        </div>
+
+        <!-- Timekeeper's Console -->
+        <div class="mt-12 p-4 bg-stone-800/30 rounded border border-amber-900/50 text-left font-mono text-sm">
+            <div class="text-amber-400">> temporal_anchor --status</div>
+            <div class="text-red-400">[×] Error 0xT1M3: Session expired</div>
+            <div class="text-orange-400">[!] Warning: Chronal stability compromised</div>
+            <div class="text-amber-400">[✓] New time vortex detected</div>
+            <div class="blink">▊</div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-stone-800 rounded-full h-2 mt-4">
+            <div id="time-progress" class="bg-amber-500 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
         </div>
     </div>
 
+    <footer class="absolute bottom-4 text-stone-500 text-sm">
+        Temporal issues? Consult the <a href="mailto:vidantacaofficial@gmail.com" class="text-orange-400 hover:underline">Timekeepers</a>
+    </footer>
+
     <script>
-        // Generate dynamic stars
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'absolute bg-white rounded-full star';
-                star.style.width = `${Math.random() * 3}px`;
-                star.style.height = star.style.width;
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.setProperty('--duration', `${Math.random() * 3 + 1}s`);
-                starsContainer.appendChild(star);
-            }
+        function rechargeTime() {
+            const hourglass = document.getElementById('hourglass');
+            const progress = document.getElementById('time-progress');
+
+            // Animate progress bar
+            progress.style.width = '30%';
+            setTimeout(() => progress.style.width = '60%', 300);
+            setTimeout(() => progress.style.width = '90%', 600);
+            setTimeout(() => {
+                progress.style.width = '100%';
+                setTimeout(() => progress.style.width = '0%', 200);
+            }, 900);
+
+            // Add hourglass animation
+            hourglass.classList.add('hourglass-glow');
+            setTimeout(() => hourglass.classList.remove('hourglass-glow'), 1000);
+
+            // Console message
+            console.log('%c[Chronos System] Time recharge attempt failed - continuum stabilized', 'color: #f59e0b; font-weight: bold;');
         }
-        createStars();
 
-    </script>
-
-    <!-- Optional: Add some space particles animation -->
-    @viteReactRefresh
-    <script type="module">
-        import confetti from 'https://cdn.skypack.dev/canvas-confetti';
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            confetti({
-                particleCount: 50,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#3B82F6', '#60A5FA', '#93C5FD'],
-                disableForReducedMotion: true
-            });
+        // Add click handler to hourglass
+        document.getElementById('hourglass').addEventListener('click', () => {
+            const icon = document.getElementById('hourglass-icon');
+            icon.classList.add('animate-flip');
+            setTimeout(() => icon.classList.remove('animate-flip'), 1000);
         });
+
     </script>
 </body>
 </html>
