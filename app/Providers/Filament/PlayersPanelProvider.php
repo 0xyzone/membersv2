@@ -85,8 +85,6 @@ class PlayersPanelProvider extends PanelProvider
                         force: false, // force the user to enable 2FA before they can use the application (default = false)
                         // action: CustomTwoFactorPage::class // optionally, use a custom 2FA page
                     )
-                    ->enableSanctumTokens(
-                    )
                     ->passwordUpdateRules(
                         rules: [Password::default()->mixedCase()->uncompromised(3)], // you may pass an array of validation rules as well. (default = ['min:8'])
                         requiresCurrentPassword: true, // when false, the user can update their password without entering their current password. (default = true)
