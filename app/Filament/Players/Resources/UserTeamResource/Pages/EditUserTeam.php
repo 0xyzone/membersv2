@@ -34,6 +34,7 @@ class EditUserTeam extends EditRecord
                                     ->orWhere('id', $search); // Exact match for ID
                             })
                             ->whereNotIn('id', [1, auth()->id()]) // Exclude user with ID 1 and the logged-in user
+                            ->role('players')
                             ->limit(1)
                             ->get()
                             ->mapWithKeys(fn(User $user) => [$user->id => "({$user->id}) {$user->name}"])

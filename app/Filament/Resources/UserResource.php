@@ -259,7 +259,7 @@ class UserResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
-            ->paginated([10, 25, 50]);
+            ->paginated([9, 12, 36]);
     }
 
     public static function getRelations(): array
