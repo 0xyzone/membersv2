@@ -262,7 +262,6 @@ class UserTeamResource extends Resource
                                     Forms\Components\Grid::make(2)
                                         ->schema([
                                             Forms\Components\TextInput::make('short_name')
-                                                ->maxLength(5)
                                                 ->placeholder('Team abbreviation')
                                                 ->helperText('Short version of team name (e.g., NYF)'),
 
@@ -458,15 +457,17 @@ class UserTeamResource extends Resource
                     ->form([
                         Select::make('recipient_id')
                             ->label('User to invite')
-                            ->options(function () {
-                                return User::whereHas('roles', function ($query) {
-                                    $query->where('name', 'players');
-                                })
-                                    ->where('id', '!=', auth()->id())
-                                    ->where('id', '!=', 1)
-                                    ->pluck('name', 'id');
-                            }) // List of users to invite
                             ->searchable()
+                            ->getSearchResultsUsing(fn(string $search): array => User::query()
+                                ->where(function ($query) use ($search) {
+                                    $query->where('email', $search) // Exact match for email
+                                        ->orWhere('id', $search); // Exact match for ID
+                                })
+                                ->whereNotIn('id', [1, auth()->id()]) // Exclude user with ID 1 and the logged-in user
+                                ->limit(1)
+                                ->get()
+                                ->mapWithKeys(fn(User $user) => [$user->id => "({$user->id}) {$user->name}"])
+                                ->toArray())
                             ->required(),
                         Select::make('role')
                             ->options([

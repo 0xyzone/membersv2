@@ -26,15 +26,18 @@ class EditUserTeam extends EditRecord
                 ->form([
                     Select::make('recipient_id')
                         ->label('User to invite')
-                        ->options(function () {
-                            return User::whereHas('roles', function ($query) {
-                                    $query->where('name', 'players');
-                                })
-                                ->where('id', '!=', auth()->id())
-                                ->where('id', '!=', 1)
-                                ->pluck('name', 'id');
-                        })
                         ->searchable()
+                        ->searchable()
+                        ->getSearchResultsUsing(fn(string $search): array => User::query()
+                            ->where(function ($query) use ($search) {
+                                $query->where('email', $search) // Exact match for email
+                                    ->orWhere('id', $search); // Exact match for ID
+                            })
+                            ->whereNotIn('id', [1, auth()->id()]) // Exclude user with ID 1 and the logged-in user
+                            ->limit(1)
+                            ->get()
+                            ->mapWithKeys(fn(User $user) => [$user->id => "({$user->id}) {$user->name}"])
+                            ->toArray())
                         ->required(),
                     Select::make('role')
                         ->options([
