@@ -178,6 +178,12 @@ class TournamentRegistrationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query) {
+                // Filter registrations for tournaments organized by the logged-in user
+                $query->whereHas('tournament', function ($q) {
+                    $q->where('user_id', auth()->id());
+                });
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('tournament.name'),
                 Tables\Columns\TextColumn::make('team.name'),
