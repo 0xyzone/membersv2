@@ -42,7 +42,6 @@ class PlayersPanelProvider extends PanelProvider
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament/players/theme.css')
-            ->unsavedChangesAlerts()
             ->discoverResources(in: app_path('Filament/Players/Resources'), for: 'App\\Filament\\Players\\Resources')
             ->discoverPages(in: app_path('Filament/Players/Pages'), for: 'App\\Filament\\Players\\Pages')
             ->pages([

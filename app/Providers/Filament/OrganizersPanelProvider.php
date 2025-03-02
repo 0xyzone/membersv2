@@ -44,7 +44,6 @@ class OrganizersPanelProvider extends PanelProvider
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament/organizers/theme.css')
-            ->unsavedChangesAlerts()
             ->discoverResources(in: app_path('Filament/Organizers/Resources'), for: 'App\\Filament\\Organizers\\Resources')
             ->discoverPages(in: app_path('Filament/Organizers/Pages'), for: 'App\\Filament\\Organizers\\Pages')
             ->pages([
@@ -86,8 +85,6 @@ class OrganizersPanelProvider extends PanelProvider
                     ->enableTwoFactorAuthentication(
                         force: false, // force the user to enable 2FA before they can use the application (default = false)
                         // action: CustomTwoFactorPage::class // optionally, use a custom 2FA page
-                    )
-                    ->enableSanctumTokens(
                     )
                     ->passwordUpdateRules(
                         rules: [Password::default()->mixedCase()->uncompromised(3)], // you may pass an array of validation rules as well. (default = ['min:8'])

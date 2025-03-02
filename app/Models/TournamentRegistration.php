@@ -10,7 +10,10 @@ class TournamentRegistration extends Model
 {
     public function players()
     {
-        return $this->belongsToMany(User::class, 'tournament_registration_players');
+        return $this->belongsToMany(User::class, 'tournament_registration_players',
+        'registration_id', // Correct foreign key for the registration
+        'user_id')
+        ->with('userGameInfos');
     }
 
     public function team()

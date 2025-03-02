@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\User;
+use Filament\Forms\Components\Radio;
 use Livewire\Component;
 use Filament\Forms\Form;
 use Filament\Facades\Filament;
@@ -14,7 +15,7 @@ use Jeffgreco13\FilamentBreezy\Livewire\MyProfileComponent;
 
 class CitizenshipDetails extends MyProfileComponent
 {
-    public array $only = ['verification_document_number', 'verification_document_issue_date', 'verification_document_expiry_date', 'verification_document_image_path'];
+    public array $only = ['verification_document_number', 'verification_document_type', 'verification_document_issue_date', 'verification_document_expiry_date', 'verification_document_image_path'];
     public array $data;
     public $user;
     public $userClass;
@@ -34,6 +35,14 @@ class CitizenshipDetails extends MyProfileComponent
         return $form
         ->model(User::class)
             ->schema([
+                Radio::make('verification_document_type')
+                ->options([
+                    "passport" => "Passport",
+                    "nid" => "NID",
+                    "citizenship" => "Citizenship"
+                ])
+                ->inline()
+                ->required(),
                 TextInput::make('verification_document_number')
                     ->required()
                     ->unique(ignorable: $this->user),

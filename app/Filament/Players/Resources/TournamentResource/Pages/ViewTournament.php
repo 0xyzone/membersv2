@@ -92,7 +92,7 @@ class ViewTournament extends ViewRecord
 
                     // Validate team members
                     $invalidMembers = $team->members()
-                        ->whereIn('user_id', $data['selected_members'])
+                        ->whereIn('user_team_members.user_id', $data['selected_members'])
                         ->whereDoesntHave('userGameInfos', fn($q) => $q->where('game_id', $tournament->game_id))
                         ->pluck('name');
 
@@ -117,7 +117,12 @@ class ViewTournament extends ViewRecord
                     ]);
 
                     // Attach selected players
-                    $registration->players()->attach($data['selected_members']);
+                    $registration->players()->attach(
+                        collect($data['selected_members'])
+                            ->mapWithKeys(fn ($userId) => [
+                                $userId => ['user_team_id' => $team->id]
+                            ])
+                    );
 
                     // Send notifications
                     Notification::make()
