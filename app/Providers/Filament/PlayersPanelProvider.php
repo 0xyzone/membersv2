@@ -34,6 +34,7 @@ class PlayersPanelProvider extends PanelProvider
             ->path('players')
             ->login()
             ->registration()
+            ->passwordReset()
             ->databaseNotifications()
             ->emailVerification()
             ->colors([

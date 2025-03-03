@@ -36,6 +36,7 @@ class OrganizersPanelProvider extends PanelProvider
             ->path('organizers')
             ->login()
             ->registration()
+            ->passwordReset()
             ->databaseNotifications()
             ->emailVerification()
             ->colors([
