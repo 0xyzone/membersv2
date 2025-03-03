@@ -2,7 +2,9 @@
 
 namespace App\Filament\Organizers\Resources;
 
+use App\Filament\Components\CustomFileUpload;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Form;
@@ -68,28 +70,22 @@ class TournamentResource extends Resource
                                 Forms\Components\Section::make('Media')
                                     ->columns(2)
                                     ->schema([
-                                        Forms\Components\FileUpload::make('logo_image_path')
+                                        FileUpload::make('logo_image_path')
                                             ->required()
                                             ->label('Tournament Logo')
                                             ->helperText('Image should be atleast 1080 x 1080 pixels big and it should be in ratio of 1:1')
-                                            ->image()
                                             ->directory('tournaments/logos')
-                                            ->imageEditor()
                                             ->panelAspectRatio('1:1')
                                             ->panelLayout('integrated')
                                             ->removeUploadedFileButtonPosition('center')
                                             ->uploadButtonPosition('center'),
 
-                                        Forms\Components\FileUpload::make('cover_image_path')
+                                        FileUpload::make('cover_image_path')
                                             ->required()
                                             ->label('Cover Image')
                                             ->panelLayout('integrated')
                                             ->uploadButtonPosition('center')
-                                            ->image()
                                             ->directory('tournaments/covers')
-                                            ->imageEditor()
-                                            ->imageResizeMode('cover')
-                                            ->imageCropAspectRatio('16:9')
                                             ->columnSpan(2)
                                             ->previewable()
                                             ->helperText('Image should be atleast 1920 x 1080 pixels big and it should be in ratio of 16:9')
