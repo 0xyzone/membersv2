@@ -48,7 +48,7 @@ class TournamentResource extends Resource
                     ->columnSpanFull()
                     ->defaultImageUrl(asset('images/tournament_cover_default.gif'))
                     ->extraAttributes([
-                        'class' => '!max-w-7xl !block mx-auto !lg:-mb-[200px]'
+                        'class' => '!max-w-5xl !block mx-auto !lg:-mb-[200px]'
                     ])
                     ->extraImgAttributes([
                         'class' => '!w-full !h-auto rounded-lg',
@@ -57,14 +57,14 @@ class TournamentResource extends Resource
                     ->label('')
                     ->defaultImageUrl(asset('images/tournament_logo_default.png'))
                     ->extraAttributes([
-                        'class' => 'lg:-mt-[350px] -mt-[120px] lg:ml-4 max-w-max aspect-square z-10 !h-max shadow-2xl'
+                        'class' => 'lg:-mt-[230px] -mt-[120px] lg:ml-4 max-w-max aspect-square z-10 !h-max shadow-2xl'
                     ])
                     ->extraImgAttributes([
                         'class' => '!w-28 lg:!w-40 aspect-square !h-auto bg-gray-800 p-4 rounded-lg border-4 border-gray-200'
                     ]),
                 Section::make('Tournament Overview')
                     ->extraAttributes([
-                        'class' => 'lg:-mt-[210px] -mt-[16px]'
+                        'class' => 'lg:-mt-[80px] -mt-[16px]'
                     ])
                     ->schema([
                         Grid::make(['md' => 3, 'default' => 2])
