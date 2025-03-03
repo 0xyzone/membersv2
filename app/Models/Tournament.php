@@ -48,10 +48,10 @@ class Tournament extends Model
             'tournament_registrations',
             'tournament_id',
             'team_id'
-        );
+        )->where('status', "approved");
     }
     
-    protected $withCount = ['teams'];
+    protected $withCount = ['teams', 'registrations'];
     protected $casts = [
         'meta_tags' => 'array',
         'start_date' => 'date',

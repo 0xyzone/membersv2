@@ -316,6 +316,16 @@ class TournamentResource extends Resource
                         $record->teams_count >= $record->max_teams ? 'danger' : 'success')
                     ->sortable(),
 
+                // Registrations
+                Tables\Columns\TextColumn::make('registrations_count')
+                    ->label('Registrations')
+                    ->numeric()
+                    ->formatStateUsing(fn(Tournament $record): string =>
+                        $record->registrations_count)
+                    ->color(fn(Tournament $record) =>
+                        $record->teams_count >= $record->max_teams ? 'danger' : 'success')
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('player_requirements')
                     ->label('Players')
                     ->formatStateUsing(fn(Tournament $record) =>
