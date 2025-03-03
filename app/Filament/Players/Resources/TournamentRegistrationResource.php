@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\View;
 use App\Models\TournamentRegistration;
 use Filament\Infolists\Components\Grid;
 use Illuminate\Database\Eloquent\Model;
@@ -184,12 +185,9 @@ class TournamentRegistrationResource extends Resource
                                                     'model' => $model
                                                 ]))
                                                 ->modalWidth('xl') // Adjust the modal width as needed,
-                                                ->modalActions([
-                                                    Action::make('close')
-                                                        ->label('Close')
-                                                        ->color('danger')
-                                                        ->close(),
-                                                ])
+                                                ->modalActions([])
+                                                ->modalSubmitAction(false)
+                                                ->modalCancelAction(false)
                                         ]),
                                     ])
                             ])

@@ -231,7 +231,8 @@ class TournamentResource extends Resource
                 Tables\Columns\ImageColumn::make('logo_image_path')
                     ->label('')
                     ->circular()
-                    ->size(50),
+                    ->size(50)
+                    ->defaultImageUrl(asset('images/tournament_logo_default.png')),
 
                 // Name and Game
                 Tables\Columns\TextColumn::make('name')
@@ -260,7 +261,7 @@ class TournamentResource extends Resource
                 Tables\Columns\TextColumn::make('teams_count')
                     ->label('Teams')
                     ->numeric()
-                    ->formatStateUsing(fn(Tournament $record) =>
+                    ->formatStateUsing(fn(Tournament $record): string =>
                         $record->teams_count . '/' . $record->max_teams)
                     ->color(fn(Tournament $record) =>
                         $record->teams_count >= $record->max_teams ? 'danger' : 'success')

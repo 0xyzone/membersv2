@@ -138,13 +138,9 @@ class TournamentRegistrationResource extends Resource
                                                     'user' => $record,
                                                     'model' => $model
                                                 ]))
-                                                ->modalWidth('xl') // Adjust the modal width as needed,
-                                                ->modalActions([
-                                                    Action::make('close')
-                                                        ->label('Close')
-                                                        ->color('danger')
-                                                        ->close(),
-                                                ])
+                                                ->modalWidth('3xl') // Adjust the modal width as needed,
+                                                ->modalSubmitAction(false)
+                                                ->modalCancelAction(false)
                                         ]),
                                     ])
                             ])

@@ -6,7 +6,6 @@ use Closure;
 use Filament\Forms;
 use App\Models\Game;
 use App\Models\User;
-use Filament\Forms\Components\Split;
 use Filament\Tables;
 use App\Models\UserTeam;
 use Filament\Forms\Form;
@@ -17,8 +16,10 @@ use App\Models\UserTeamMember;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\DB;
+use Filament\Forms\Components\Split;
 use Filament\Forms\Components\Select;
 use Filament\Infolists\Components\Grid;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Infolists\Components\Group;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Actions;
@@ -56,6 +57,11 @@ class UserTeamResource extends Resource
                 ->join('user_team_members', 'user_teams.id', '=', 'user_team_members.user_team_id')
                 ->where('user_team_members.user_id', $user->id);
         })->exists();
+    }
+
+    public static function canDelete(Model $model): bool
+    {
+        return false;
     }
 
     public static function infolist(Infolist $infolist): Infolist
@@ -461,13 +467,14 @@ class UserTeamResource extends Resource
                             ->getSearchResultsUsing(fn(string $search): array => User::query()
                                 ->where(function ($query) use ($search) {
                                     $query->where('email', $search) // Exact match for email
-                                        ->orWhere('id', $search); // Exact match for ID
+                                        ->orWhere('id', $search) // Exact match for ID
+                                        ->orWhere('user_id', $search);
                                 })
                                 ->whereNotIn('id', [1, auth()->id()]) // Exclude user with ID 1 and the logged-in user
                                 ->role('players')
                                 ->limit(1)
                                 ->get()
-                                ->mapWithKeys(fn(User $user) => [$user->id => "({$user->id}) {$user->name}"])
+                                ->mapWithKeys(fn(User $user) => [$user->id => "({$user->id}) {$user->name} | {$user->user_id}"])
                                 ->toArray())
                             ->required(),
                         Select::make('role')
@@ -577,9 +584,9 @@ class UserTeamResource extends Resource
                     })
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 

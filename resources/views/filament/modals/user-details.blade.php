@@ -80,7 +80,7 @@
                 </a>
             </div>
             @else
-            <p>User hasn't uploaded the document yet.</p>
+            <img src="{{ asset('images/document_default.png') }}" alt="image not loaded" class="w-full rounded-[2.67rem] lg:rounded-[4rem] object-cover hover:scale-105 transition-transform duration-300" loading="lazy" crossorigin="anonymous">
             @endif
         </div>
         <div class="col-span-2">

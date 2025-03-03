@@ -281,92 +281,89 @@ class TournamentResource extends Resource
         return $table
             ->modifyQueryUsing(fn(Builder $query) => $query->where('user_id', auth()->user()->id))
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('game.name')
-                    ->numeric()
-                    ->sortable(),
+                // Logo Column
+                Tables\Columns\ImageColumn::make('logo_image_path')
+                    ->label('')
+                    ->circular()
+                    ->size(50)
+                    ->defaultImageUrl(asset('images/tournament_logo_default.png')),
+
+                // Name and Game
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\ImageColumn::make('logo_image_path'),
-                Tables\Columns\ImageColumn::make('cover_image_path'),
-                Tables\Columns\TextColumn::make('platforms')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('type')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('meta_title')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('meta_description')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('discord_invite_link')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->description(fn(Tournament $record) => $record->game->name)
+                    ->weight('medium')
+                    ->wrap(),
+
+                // Schedule
                 Tables\Columns\TextColumn::make('start_date')
-                    ->date()
+                    ->label('Tournament Dates')
+                    ->dateTime('M d, Y')
+                    ->description(fn(Tournament $record) =>
+                        'End: ' . $record->end_date->format('M d, Y'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('end_date')
-                    ->date()
-                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('registration_start_date')
-                    ->date()
+                    ->label('Registration Dates')
+                    ->dateTime('M d, Y')
+                    ->description(fn(Tournament $record) =>
+                        'End: ' . $record->registration_end_date->format('M d, Y'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('registration_end_date')
-                    ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('max_teams')
+
+                // Teams and Players
+                Tables\Columns\TextColumn::make('teams_count')
+                    ->label('Teams')
                     ->numeric()
+                    ->formatStateUsing(fn(Tournament $record): string =>
+                        $record->teams_count . '/' . $record->max_teams)
+                    ->color(fn(Tournament $record) =>
+                        $record->teams_count >= $record->max_teams ? 'danger' : 'success')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('min_team_players')
-                    ->numeric()
+
+                Tables\Columns\TextColumn::make('player_requirements')
+                    ->label('Players')
+                    ->formatStateUsing(fn(Tournament $record) =>
+                        $record->min_team_players . '-' .
+                        $record->max_team_players . ' players')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('max_team_players')
-                    ->numeric()
-                    ->sortable(),
+
+                // Organizer
                 Tables\Columns\TextColumn::make('organizer_name')
+                    ->label('Organizer')
+                    ->description(fn(Tournament $record) =>
+                        $record->organizer_contact_email)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('organizer_contact_number')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('organizer_alt_contact_number')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('organizer_contact_email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('status'),
-                Tables\Columns\IconColumn::make('is_public')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('is_verified')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('stream_url')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('official_hashtag')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('website_url')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('twitter_url')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('facebook_url')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('min_player_age')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('approved_at')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('approved_by')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+
+                // Platform and Type
+                Tables\Columns\TextColumn::make('platform')
+                    ->badge()
+                    ->color('gray')
+                    ->extraAttributes([
+                        'class' => 'capitalize'
+                    ]),
+
+                Tables\Columns\TextColumn::make('type')
+                    ->badge()
+                    ->color('gray')
+                    ->icon('heroicon-o-trophy'),
+
+                Tables\Columns\TextColumn::make('entry_fee')
+                    ->formatStateUsing(fn($state) => $state == 0 ? 'Free' : 'Rs. ' . $state)
             ])
             ->filters([
-                //
+
+                Tables\Filters\Filter::make('registration_open')
+                    ->label('Registration Open')
+                    ->query(fn(Builder $query): Builder => $query
+                        ->where('registration_start_date', '<=', now())
+                        ->where('registration_end_date', '>=', now())),
+
+                Tables\Filters\SelectFilter::make('platform')
+                    ->options(TournamentPlatforms::filamentOptions()),
+
+                Tables\Filters\SelectFilter::make('type')
+                    ->options(TournamentTypes::filamentOptions()),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

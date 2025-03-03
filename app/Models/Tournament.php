@@ -35,18 +35,23 @@ class Tournament extends Model
         return $this->hasMany(TournamentRegistration::class);
     }
 
-    // protected $withCount = ['teams'];
-
+    
     public function getPlayerRequirementsAttribute()
     {
         return "{$this->min_team_players}-{$this->max_team_players} players";
     }
-
+    
     public function teams()
     {
-        return $this->belongsToMany(UserTeam::class, 'tournament_registrations', 'team_id');
+        return $this->belongsToMany(
+            UserTeam::class,
+            'tournament_registrations',
+            'tournament_id',
+            'team_id'
+        );
     }
-
+    
+    protected $withCount = ['teams'];
     protected $casts = [
         'meta_tags' => 'array',
         'start_date' => 'date',

@@ -31,13 +31,14 @@ class EditUserTeam extends EditRecord
                         ->getSearchResultsUsing(fn(string $search): array => User::query()
                             ->where(function ($query) use ($search) {
                                 $query->where('email', $search) // Exact match for email
-                                    ->orWhere('id', $search); // Exact match for ID
-                            })
+                                    ->orWhere('id', $search) // Exact match for ID
+                                    ->orWhere('user_id', $search);
+                                })
                             ->whereNotIn('id', [1, auth()->id()]) // Exclude user with ID 1 and the logged-in user
                             ->role('players')
                             ->limit(1)
                             ->get()
-                            ->mapWithKeys(fn(User $user) => [$user->id => "({$user->id}) {$user->name}"])
+                            ->mapWithKeys(fn(User $user) => [$user->id => "({$user->id}) {$user->name} | {$user->user_id}"])
                             ->toArray())
                         ->required(),
                     Select::make('role')
