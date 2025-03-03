@@ -81,7 +81,6 @@ class TournamentResource extends Resource
                                             ->uploadButtonPosition('center'),
 
                                         FileUpload::make('cover_image_path')
-                                            ->required()
                                             ->label('Cover Image')
                                             ->panelLayout('integrated')
                                             ->uploadButtonPosition('center')
