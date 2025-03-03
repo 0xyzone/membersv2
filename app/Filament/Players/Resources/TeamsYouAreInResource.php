@@ -33,7 +33,6 @@ class TeamsYouAreInResource extends Resource
     protected static ?string $modelLabel = "Associated Teams";
     protected static ?string $slug = "teamsurin";
     protected static ?int $navigationSort = 2;
-    protected static ?string $navigationParentItem = 'Your Teams';
     protected static ?string $navigationGroup = "Team Management";
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $activeNavigationIcon = 'heroicon-s-user-group';
