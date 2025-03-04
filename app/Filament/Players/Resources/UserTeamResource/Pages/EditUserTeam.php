@@ -79,7 +79,7 @@ class EditUserTeam extends EditRecord
                     // Validation: Prevent inviting existing team members
                     if ($team->members()->where('user_team_members.user_id', $recipient->id)->exists()) {
                         FilamentNotification::make()
-                            ->title('User is already a team!')
+                            ->title('User is already a team member!')
                             ->danger()
                             ->send();
                         return;
