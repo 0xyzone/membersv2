@@ -30,7 +30,7 @@ class TournamentRegistrationNotification extends Notification implements ShouldQ
         ->subject('New Tournament Registration')
         ->markdown('emails.tournament-registration', [
             'registration' => $this->registration,
-            // 'url' => route('filament.admin.resources.tournament-registrations.view', $this->registration)
+            'url' => route('filament.players.resources.tournament-registrations.view', $this->registration)
         ]);
     }
 
@@ -41,11 +41,11 @@ class TournamentRegistrationNotification extends Notification implements ShouldQ
             ->icon('heroicon-o-user-group')
             ->iconColor('success')
             ->body("Team {$this->registration->team->name} registered for {$this->registration->tournament->name}")
-            // ->actions([
-            //     \Filament\Notifications\Actions\Action::make('view')
-            //         ->label('View Registration')
-            //         // ->url(TournamentRegistrationResource::getUrl('view', ['record' => $this->registration]))
-            // ])
+            ->actions([
+                \Filament\Notifications\Actions\Action::make('view')
+                    ->label('View Registration')
+                    ->url(route('filament.players.resources.tournament-registrations.view', $this->registration))
+            ])
             ->getDatabaseMessage();
     }
 
