@@ -27,8 +27,6 @@ class UpcomingTournaments extends TableWidget
         return [
             ImageColumn::make('game.image_path')
                 ->label('Game')
-                ->width(80)
-                ->height(80)
                 ->disk('public'),
 
             TextColumn::make('name')
@@ -55,7 +53,7 @@ class UpcomingTournaments extends TableWidget
 
             TextColumn::make('prize_pool')
                 ->limit(30)
-                ->icon('heroicon-o-currency-dollar')
+                ->default('N/a')
                 ->color('success'),
         ];
     }
