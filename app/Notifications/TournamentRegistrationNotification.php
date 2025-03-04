@@ -30,7 +30,7 @@ class TournamentRegistrationNotification extends Notification implements ShouldQ
         ->subject('New Tournament Registration')
         ->markdown('emails.tournament-registration', [
             'registration' => $this->registration,
-            'url' => route('filament.admin.resources.tournament-registrations.view', $this->registration)
+            // 'url' => route('filament.admin.resources.tournament-registrations.view', $this->registration)
         ]);
     }
 
