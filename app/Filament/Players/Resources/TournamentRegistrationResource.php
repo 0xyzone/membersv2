@@ -243,6 +243,7 @@ class TournamentRegistrationResource extends Resource
                     ->extraAttributes([
                         'class' => 'capitalize'
                     ]),
+                Tables\Columns\TextColumn::make('notes'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

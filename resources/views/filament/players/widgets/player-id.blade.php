@@ -12,7 +12,7 @@
                 <div class="shrink-0 flex flex-col lg:items-end gap-2">
                     <p class="lg:text-right text-xs text-gray-500">UUID</p>
                     <div class="flex items-center gap-1">
-                        <p class="font-bold text-nowrap flex-nowrap shrink-0 text-xs lg:text-lg">{{ $user->user_id }}</p>
+                        <p class="font-bold text-nowrap flex-nowrap shrink-0 text-xs lg:text-sm">{{ $user->user_id }}</p>
                         <button type="button" class="text-primary-500 hover:text-primary-600 transition-colors relative" x-data="{
         uuid: @js($user->user_id),
         showTooltip: false,

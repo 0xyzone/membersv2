@@ -17,13 +17,34 @@ class ViewTournamentRegistration extends ViewRecord
                 ->color('success')
                 ->icon('heroicon-o-check-circle')
                 ->action(function () {
-                    $this->record->update(['status' => 'approved']);
+                    $this->record->update([
+                        'status' => 'approved',
+                        'notes' => null
+                    ]);
 
                     Notification::make()
                         ->title('Registration Approved')
                         ->body('Team has been approved for the tournament')
                         ->success()
                         ->send();
+
+                    // Get the team and owner
+                    $team = $this->record->team;
+                    $owner = $team->owner;
+                    $players = $this->record->players;
+
+                    // Combine owner and players, filter nulls
+                    $recipients = collect([$owner])
+                        ->merge($players)
+                        ->filter();
+
+                    if ($recipients->isNotEmpty()) {
+                        Notification::make()
+                            ->title('Tournament Registration Approved')
+                            ->body("Team '{$team?->name}' has been approved for the tournament {$this->record->tournament->name}")
+                            ->success()
+                            ->sendToDatabase($recipients);
+                    }
                 })
                 ->visible(fn() => $this->record->status === 'pending'),
 
@@ -37,7 +58,7 @@ class ViewTournamentRegistration extends ViewRecord
                 ])
                 ->action(function (array $data) {
                     $this->record->update([
-                        'status' => 'declined',
+                        'status' => 'rejected',
                         'notes' => $data['reason']
                     ]);
 
@@ -46,6 +67,24 @@ class ViewTournamentRegistration extends ViewRecord
                         ->body('Reason: ' . $data['reason'])
                         ->danger()
                         ->send();
+
+                    // Get the team and owner
+                    $team = $this->record->team;
+                    $owner = $team->owner;
+                    $players = $this->record->players;
+
+                    // Combine owner and players, filter nulls
+                    $recipients = collect([$owner])
+                        ->merge($players)
+                        ->filter();
+
+                    if ($recipients->isNotEmpty()) {
+                        Notification::make()
+                            ->title('Tournament Registration Declined')
+                            ->body("Team '{$team?->name}' was declined for the tournament {$this->record->tournament->name}. Reason: " . $data['reason'])
+                            ->danger()
+                            ->sendToDatabase($recipients);
+                    }
                 })
                 ->visible(fn() => $this->record->status === 'pending'),
         ];

@@ -112,7 +112,7 @@ class TournamentRegistrationResource extends Resource
                     ->schema([
                         RepeatableEntry::make('players')
                             ->schema([
-                                Grid::make(4)
+                                Grid::make(7)
                                     ->schema([
                                         ImageEntry::make('avatar_url')
                                             ->simpleLightbox()
@@ -123,10 +123,23 @@ class TournamentRegistrationResource extends Resource
                                             ->height(50),
 
                                         TextEntry::make('name')
-                                            ->weight('medium'),
-                                        TextEntry::make('date_of_birth')
+                                            ->color('primary')
                                             ->weight('medium')
-                                            ->date('jS F, Y'),
+                                            ->default('N/a'),
+                                        TextEntry::make('email')
+                                            ->color('primary')
+                                            ->weight('medium')
+                                            ->default('N/a'),
+                                        TextEntry::make('primary_contact_number')
+                                        ->label('Contact')
+                                            ->weight('medium')
+                                            ->color('primary')
+                                            ->default('N/a'),
+                                        TextEntry::make('current_address')
+                                            ->weight('medium')
+                                            ->color('primary')
+                                            ->default('N/a')
+                                            ->columnSpan(2),
                                         Actions::make([
                                             Action::make('view')
                                                 ->label('View Details')
@@ -141,7 +154,9 @@ class TournamentRegistrationResource extends Resource
                                                 ->modalWidth('3xl') // Adjust the modal width as needed,
                                                 ->modalSubmitAction(false)
                                                 ->modalCancelAction(false)
-                                        ]),
+                                        ])
+                                        ->alignCenter()
+                                        ->extraAttributes(['class' => 'flex items-center justify-center h-full']),
                                     ])
                             ])
                             ->columns(1)
@@ -184,6 +199,7 @@ class TournamentRegistrationResource extends Resource
                 Tables\Columns\TextColumn::make('tournament.name'),
                 Tables\Columns\TextColumn::make('team.name'),
                 Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\TextColumn::make('notes'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
