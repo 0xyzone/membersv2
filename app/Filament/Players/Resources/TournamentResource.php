@@ -55,13 +55,13 @@ class TournamentResource extends Resource
                     ]),
                 ImageEntry::make('logo_image_path')
                     ->label('')
-                    ->simpleLightbox()
+                    ->simpleLightbox(fn (Tournament $record) => $record?->logo_image_path ? asset('storage/{$record->logo_image_path}') : asset('images/tournament_logo_default.png'))
                     ->defaultImageUrl(asset('images/tournament_logo_default.png'))
-                    ->extraAttributes([
-                        'class' => 'lg:-mt-[230px] -mt-[120px] !w-28 lg:!w-40 lg:ml-4 max-w-max aspect-square z-10 !h-max shadow-2xl bg-gray-800 border-4 border-gray-200 p-4 flex justify-center'
-                    ])
+                    // ->extraAttributes([
+                    //     'class' => 'max-w-max z-10 !h-max shadow-2xl'
+                    // ])
                     ->extraImgAttributes([
-                        'class' => '!max-w-full !w-full !h-full object-contain'
+                        'class' => 'lg:-mt-[230px] -mt-[120px] !w-28 lg:!w-40 lg:ml-4 !h-28 lg:!h-40 object-scale-down bg-gray-800 border-4 border-gray-200' // Ensure no cropping
                     ]),
                 Section::make('Tournament Overview')
                     ->extraAttributes([
