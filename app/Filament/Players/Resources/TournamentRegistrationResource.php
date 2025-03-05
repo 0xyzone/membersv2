@@ -43,6 +43,21 @@ class TournamentRegistrationResource extends Resource
         return false;
     }
 
+    public static function canView(Model $model): bool
+    {
+        $userId = auth()->id();
+
+        // Check if the user is the team owner
+        $isTeamOwner = $model->team->user_id === $userId;
+
+        // Check if the user is a member of the registered team
+        $isTeamMember = $model->team->members()
+            ->where('user_team_members.user_id', $userId)
+            ->exists();
+
+        return $isTeamOwner || $isTeamMember;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
