@@ -55,6 +55,7 @@ class TournamentResource extends Resource
                     ]),
                 ImageEntry::make('logo_image_path')
                     ->label('')
+                    ->simpleLightbox()
                     ->defaultImageUrl(asset('images/tournament_logo_default.png'))
                     ->extraAttributes([
                         'class' => 'lg:-mt-[230px] -mt-[120px] !w-28 lg:!w-40 lg:ml-4 max-w-max aspect-square z-10 !h-max shadow-2xl bg-gray-800 border-4 border-gray-200 p-4 flex justify-center'
