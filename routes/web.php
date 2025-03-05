@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DemoController;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\HandleInvitationAction;
 use App\Http\Controllers\InvitationController;
@@ -16,3 +17,5 @@ Route::post('/verify', [VerificationController::class, 'applyForVerification'])-
 Route::get('/check419', function () {
     return view('errors.419');
 });
+
+Route::get('demonstration', [DemoController::class, 'index']);

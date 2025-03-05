@@ -27,20 +27,22 @@ class TournamentPlayersRegistrationNotification extends Notification implements 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-        ->subject('New Tournament Registration')
-        ->markdown('emails.tournament-registrations', [
-            'registration' => $this->registration,
-            'url' => route('filament.players.resources.tournament-registrations.view', $this->registration)
-        ]);
+            ->subject('Tournament Registration Confirmation')
+            ->greeting("Hello {$notifiable->name}!")
+            ->line('You have been registered for the tournament:')
+            ->line('**Tournament:** ' . $this->registration->tournament->name)
+            ->line('**Team:** ' . $this->registration->team->name)
+            ->action('View Registration', route('filament.players.resources.tournament-registrations.view', $this->registration))
+            ->line('Thank you for participating!');
     }
 
     public function toDatabase(object $notifiable): array
     {
         return FilamentNotification::make()
-            ->title('New Tournament Registration')
+            ->title('Tournament Registration Confirmation')
             ->icon('heroicon-o-user-group')
             ->iconColor('success')
-            ->body("Team {$this->registration->team->name} registered for {$this->registration->tournament->name}")
+            ->body("You've been registered for {$this->registration->tournament->name} as part of team {$this->registration->team->name}")
             ->actions([
                 \Filament\Notifications\Actions\Action::make('view')
                     ->label('View Registration')

@@ -120,7 +120,7 @@ class ViewTournament extends ViewRecord
                     // Attach selected players
                     $registration->players()->attach(
                         collect($data['selected_members'])
-                            ->mapWithKeys(fn ($userId) => [
+                            ->mapWithKeys(fn($userId) => [
                                 $userId => ['user_team_id' => $team->id]
                             ])
                     );
@@ -134,9 +134,17 @@ class ViewTournament extends ViewRecord
 
                     // Notify organizer and players
                     $tournament->user->notify(new TournamentRegistrationNotification($registration));
-                    $registration->players->each->notify(
+                    // - Team owner (new)
+                    $team->owner->notify(
                         new TournamentPlayersRegistrationNotification($registration)
                     );
+
+                    // - Selected players (existing, but ensure proper delivery)
+                    $registration->players->each(function ($player) use ($registration) {
+                        $player->notify(
+                            new TournamentPlayersRegistrationNotification($registration)
+                        );
+                    });
                 })
                 ->visible(function () {
                     return $this->getRecord()->status === 'published' &&
