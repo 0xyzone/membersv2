@@ -30,7 +30,7 @@ class TournamentPlayersRegistrationNotification extends Notification implements 
         ->subject('New Tournament Registration')
         ->markdown('emails.tournament-registrations', [
             'registration' => $this->registration,
-            'url' => route('filament.playerss.resources.tournament-registrations.view', $this->registration)
+            'url' => route('filament.players.resources.tournament-registrations.view', $this->registration)
         ]);
     }
 
@@ -44,7 +44,7 @@ class TournamentPlayersRegistrationNotification extends Notification implements 
             ->actions([
                 \Filament\Notifications\Actions\Action::make('view')
                     ->label('View Registration')
-                    ->url(route('filament.playerss.resources.tournament-registrations.view', $this->registration))
+                    ->url(route('filament.players.resources.tournament-registrations.view', $this->registration))
             ])
             ->getDatabaseMessage();
     }
