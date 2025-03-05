@@ -38,5 +38,9 @@ class AppServiceProvider extends ServiceProvider
             </div>
         ', ['user' => Filament::auth()->user()])
         );
+        FilamentView::registerRenderHook(
+            'panels::user-menu.before',
+            fn (): string => '', // Remove theme switcher
+        );
     }
 }

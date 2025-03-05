@@ -37,6 +37,7 @@ use Filament\Infolists\Components\Grid as InfoGrid;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists\Components\Split as IngoSplit;
 use App\Filament\Resources\UserResource\RelationManagers;
+use Filament\Infolists\Components\TextEntry\TextEntrySize;
 
 class UserResource extends Resource
 {
@@ -61,15 +62,25 @@ class UserResource extends Resource
             ->schema([
                 IngoSplit::make([
                     ImageEntry::make('avatar_url')
-                        ->label('Avatar')
+                        ->label('')
                         ->size(150)
                         ->circular()
+                        ->grow(false)
                         ->defaultImageUrl(asset('images/user_default.png')),
 
-                    InfoGrid::make(2)->schema([
+                    InfoGrid::make(3)->schema([
                         TextEntry::make('name')
-                            // ->size(TextSize::Large)
+                            ->size(TextEntrySize::Large)
                             ->weight(FontWeight::Bold),
+
+                        TextEntry::make('user_id')
+                            ->label('UUID')
+                            ->color('gray')
+                            ->columnSpan(2)
+                            ->weight(FontWeight::Bold)
+                            ->copyable()
+                            ->copyMessage('Copied!')
+                            ->copyMessageDuration('3000'),
 
                         TextEntry::make('username')
                             ->icon('heroicon-m-at-symbol')
@@ -78,6 +89,8 @@ class UserResource extends Resource
                         TextEntry::make('email')
                             ->icon('heroicon-m-envelope')
                             ->copyable()
+                            ->copyMessage('Copied!')
+                            ->copyMessageDuration('3000')
                             ->color('gray'),
 
                         TextEntry::make('date_of_birth')
@@ -87,8 +100,13 @@ class UserResource extends Resource
                 ])->columnSpanFull(),
 
                 Section::make('Personal Information')
-                    ->columns(3)
+                    ->columns(4)
                     ->schema([
+                        TextEntry::make('id')
+                        ->label('User Id')
+                        ->copyable()
+                        ->copyMessage('Copied!')
+                        ->copyMessageDuration('3000'),
                         TextEntry::make('gender'),
                         TextEntry::make('created_at')
                             ->dateTime('M d, Y h:i A'),
@@ -98,9 +116,12 @@ class UserResource extends Resource
                     ]),
 
                 Section::make('Social Media Accounts')
+                    ->collapsible()
+                    ->collapsed()
                     ->icon('heroicon-o-share')
                     ->schema([
                         RepeatableEntry::make('socials')
+                            ->label('')
                             ->schema([
                                 TextEntry::make('type')
                                     ->label('Platform')
@@ -117,7 +138,7 @@ class UserResource extends Resource
                                             ->url(fn($record) => $record->link)
                                             ->openUrlInNewTab()
                                             ->iconSize('sm')
-                                            ->tooltip(fn($record) => 'Visit ' . ucfirst($record->type))
+                                        // ->tooltip(fn($record) => 'Visit ' . ucfirst($record->type))
                                     )
                             ])
                             ->columns(2)
@@ -126,6 +147,7 @@ class UserResource extends Resource
 
                 Section::make('Verification Documents')
                     ->collapsible()
+                    ->collapsed()
                     ->schema([
                         TextEntry::make('verification_document_number'),
                         TextEntry::make('verification_document_issue_date')
@@ -134,8 +156,10 @@ class UserResource extends Resource
                             ->date(),
                         ImageEntry::make('verification_document_image_path')
                             ->label('Document Image')
-                            ->width('50%'),
-                    ]),
+                            ->simpleLightbox()
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(3),
             ]);
     }
 

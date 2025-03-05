@@ -6,6 +6,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
+use Filament\Enums\ThemeMode;
 use App\Livewire\PersonalDetails;
 use Filament\Support\Colors\Color;
 use App\Livewire\CitizenshipDetails;
@@ -41,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Teal,
             ])
+            ->defaultThemeMode(ThemeMode::Dark)
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament/admin/theme.css')

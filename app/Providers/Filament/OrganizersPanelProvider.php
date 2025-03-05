@@ -7,6 +7,7 @@ use Filament\Panel;
 use Filament\Widgets;
 use App\Events\Registered;
 use Filament\PanelProvider;
+use Filament\Enums\ThemeMode;
 use App\Livewire\PersonalDetails;
 use Filament\Support\Colors\Color;
 use App\Livewire\CitizenshipDetails;
@@ -42,6 +43,7 @@ class OrganizersPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->defaultThemeMode(ThemeMode::Dark)
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament/organizers/theme.css')
