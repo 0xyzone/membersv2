@@ -35,7 +35,7 @@ class UserSocialResource extends Resource
                     ->required()
                     ->options([
                         'facebook' => 'Facebook',
-                        'insta' => 'Instagram',
+                        'instagram' => 'Instagram',
                         'x' => 'X (Twitter)',
                         'discord' => 'Discord',
                         'twitch' => 'Twitch'

@@ -125,7 +125,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
      */
     public function socials(): HasMany
     {
-        return $this->hasMany(UserSocial::class);
+        return $this->hasMany(UserSocial::class)->where('is_public', true);
     }
 
     /**

@@ -188,7 +188,7 @@
                                 <x-dynamic-component :component="'bi-' . $social->type" class="w-4 h-4 sm:w-6 sm:h-6 {{ match(strtolower($social->type)) {
                                         'facebook' => 'text-[#1877F2]',
                                         'x' => 'text-[#1DA1F2]',
-                                        'insta' => 'text-[#E1306C]',
+                                        'instagram' => 'text-[#E1306C]',
                                         'twitch' => 'text-[#9146FF]',
                                         'discord' => 'text-[#5865F2]',
                                         default => 'text-slate-400'
