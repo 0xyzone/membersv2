@@ -60,10 +60,19 @@ class ViewTournament extends ViewRecord
                         ->label('Select Participating Players')
                         ->options(function (\Filament\Forms\Get $get) {
                             $team = UserTeam::find($get('team_id'));
-                            return $team?->members()
-                                ->wherePivot('role', 'player') // Only allow players (not substitutes)
+                            // Get owner details
+                            $owner = [
+                                $team->owner->id => $team->owner->name . ' (Owner)'
+                            ];
+
+                            // Get team members with player role
+                            $players = $team->members()
+                                ->wherePivot('role', 'player')
                                 ->pluck('name', 'user_team_members.user_id')
                                 ->toArray();
+
+                            // Combine owner and players, ensuring owner is first
+                            return $owner + $players;
                         })
                         ->required()
                         ->rule(function (\Filament\Forms\Get $get) {
