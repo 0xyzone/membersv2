@@ -4,29 +4,38 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use App\Models\User;
-use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Forms\Form;
-use Filament\Tables\Columns\Layout\Panel;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\Color;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Support\Enums\TextSize;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Layout\Grid;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Columns\Layout\Panel;
 use Filament\Tables\Columns\Layout\Split;
 use Filament\Tables\Columns\Layout\Stack;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
 use App\Filament\Resources\UserResource\Pages;
+use Filament\Infolists\Components\Actions\Action;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\Grid as InfoGrid;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Infolists\Components\Split as IngoSplit;
 use App\Filament\Resources\UserResource\RelationManagers;
 
 class UserResource extends Resource
@@ -44,6 +53,114 @@ class UserResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                IngoSplit::make([
+                    ImageEntry::make('avatar_url')
+                        ->label('Avatar')
+                        ->size(150)
+                        ->circular()
+                        ->defaultImageUrl(asset('images/user_default.png')),
+
+                    InfoGrid::make(2)->schema([
+                        TextEntry::make('name')
+                            // ->size(TextSize::Large)
+                            ->weight(FontWeight::Bold),
+
+                        TextEntry::make('username')
+                            ->icon('heroicon-m-at-symbol')
+                            ->color('gray'),
+
+                        TextEntry::make('email')
+                            ->icon('heroicon-m-envelope')
+                            ->copyable()
+                            ->color('gray'),
+
+                        TextEntry::make('date_of_birth')
+                            ->icon('heroicon-m-cake')
+                            ->date(),
+                    ]),
+                ])->columnSpanFull(),
+
+                Section::make('Personal Information')
+                    ->columns(3)
+                    ->schema([
+                        TextEntry::make('gender'),
+                        TextEntry::make('created_at')
+                            ->dateTime('M d, Y h:i A'),
+                        TextEntry::make('email_verified_at')
+                            ->dateTime('M d, Y h:i A')
+                            ->label('Email Verified'),
+                    ]),
+
+                Section::make('Social Media Accounts')
+                    ->icon('heroicon-o-share')
+                    ->schema([
+                        RepeatableEntry::make('socials')
+                            ->schema([
+                                TextEntry::make('type')
+                                    ->label('Platform')
+                                    ->icon(fn($state) => self::getSocialIcon($state))
+                                    ->badge()
+                                    ->color(fn($state) => self::getSocialColor($state)),
+
+                                TextEntry::make('username')
+                                    ->copyable()
+                                    ->suffixAction(
+                                        Action::make('visit-social')
+                                            ->icon('heroicon-o-arrow-top-right-on-square')
+                                            ->color(fn($record) => self::getSocialColor($record->type))
+                                            ->url(fn($record) => $record->link)
+                                            ->openUrlInNewTab()
+                                            ->iconSize('sm')
+                                            ->tooltip(fn($record) => 'Visit ' . ucfirst($record->type))
+                                    )
+                            ])
+                            ->columns(2)
+                            ->grid(2)
+                    ]),
+
+                Section::make('Verification Documents')
+                    ->collapsible()
+                    ->schema([
+                        TextEntry::make('verification_document_number'),
+                        TextEntry::make('verification_document_issue_date')
+                            ->date(),
+                        TextEntry::make('verification_document_expiry_date')
+                            ->date(),
+                        ImageEntry::make('verification_document_image_path')
+                            ->label('Document Image')
+                            ->width('50%'),
+                    ]),
+            ]);
+    }
+
+    private static function getSocialIcon(string $platform): string
+    {
+        return match (strtolower($platform)) {
+            'facebook' => 'bi-facebook',
+            'x' => 'bi-x',
+            'insta' => 'bi-instagram',
+            'twitch' => 'bi-twitch',
+            'discord' => 'bi-discord',
+            default => 'bi-link',
+        };
+    }
+
+    private static function getSocialColor(string $platform): string
+    {
+        return match (strtolower($platform)) {
+            'facebook' => '#1877F2',  // Facebook blue
+            'x' => '#000000',  // X/Twitter black
+            'insta' => '#E1306C',  // Instagram pink
+            'twitch' => '#9146FF',  // Twitch purple
+            'discord' => '#5865F2',  // Discord blue
+            default => 'gray',
+        };
     }
 
     public static function form(Form $form): Form
@@ -240,6 +357,7 @@ class UserResource extends Resource
                     ->query(fn($query) => $query->where('is_verified', true)),
             ])
             ->actions([
+                ViewAction::make('view'),
                 EditAction::make()
                     ->icon('heroicon-o-pencil')
                     ->color('primary'),
@@ -248,6 +366,7 @@ class UserResource extends Resource
                     ->icon('heroicon-o-trash')
                     ->color('danger'),
             ])
+            ->recordAction('view')
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -274,7 +393,7 @@ class UserResource extends Resource
         return [
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            // 'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 }

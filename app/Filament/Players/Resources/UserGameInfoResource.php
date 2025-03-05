@@ -22,6 +22,8 @@ class UserGameInfoResource extends Resource
     protected static ?string $modelLabel = "Game Info";
     protected static ?string $slug = "game-info";
 
+    protected static ?string $navigationGroup = 'User Management';
+    protected static ?int $navigationSort = 1;
     protected static ?string $navigationIcon = 'heroicon-o-identification';
     protected static ?string $activeNavigationIcon = 'heroicon-m-identification';
 

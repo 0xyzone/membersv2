@@ -7,7 +7,7 @@ use Filament\Panel;
 use App\Models\Social;
 use App\Models\Document;
 use App\Models\UserTeam;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\UserSocial;
 use Illuminate\Support\Str;
 use App\Models\UserGameInfo;
 use Filament\Facades\Filament;
@@ -15,6 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -124,7 +125,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
      */
     public function socials(): HasMany
     {
-        return $this->hasMany(Social::class);
+        return $this->hasMany(UserSocial::class);
     }
 
     /**
