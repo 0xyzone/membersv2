@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Termwind\Enums\Color;
 use Filament\Facades\Filament;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
@@ -42,5 +44,8 @@ class AppServiceProvider extends ServiceProvider
             'panels::user-menu.before',
             fn (): string => '', // Remove theme switcher
         );
+        Route::bind('user', function ($value) {
+            return User::where('user_id', $value)->firstOrFail();
+        });
     }
 }

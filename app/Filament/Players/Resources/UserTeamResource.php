@@ -209,204 +209,192 @@ class UserTeamResource extends Resource
                         ->columns(1)
                         ->columnSpan(1),
                     // Main team information section
-                    Forms\Components\Section::make('Team Information')
-                        ->schema([
-                            Forms\Components\Grid::make()
-                                ->schema([
-                                    Forms\Components\Select::make('game_id')
-                                        ->relationship(
-                                            name: 'game',
-                                            titleAttribute: 'name',
-                                            modifyQueryUsing: fn(Builder $query) => $query
-                                                ->whereNotIn(
-                                                    'id',
-                                                    auth()->user()->ownedTeams()
-                                                        ->pluck('game_id')
-                                                        ->merge(auth()->user()->teams()->pluck('game_id'))
-                                                        ->unique()
-                                                )
-                                                // New condition: Only games with existing user game info
-                                                ->whereIn(
-                                                    'id',
-                                                    auth()->user()->userGameInfos()
-                                                        ->pluck('game_id')
-                                                )
-                                        )
-                                        ->hiddenOn('edit')
-                                        ->required()
-                                        ->helperText(function () {
-                                            $user = auth()->user();
+                    Forms\Components\Group::make([
+                        Forms\Components\Section::make('Team Information')
+                            ->schema([
+                                Forms\Components\Grid::make()
+                                    ->schema([
+                                        Forms\Components\Select::make('game_id')
+                                            ->relationship(
+                                                name: 'game',
+                                                titleAttribute: 'name',
+                                                modifyQueryUsing: fn(Builder $query) => $query
+                                                    ->whereNotIn(
+                                                        'id',
+                                                        auth()->user()->ownedTeams()
+                                                            ->pluck('game_id')
+                                                            ->merge(auth()->user()->teams()->pluck('game_id'))
+                                                            ->unique()
+                                                    )
+                                                    // New condition: Only games with existing user game info
+                                                    ->whereIn(
+                                                        'id',
+                                                        auth()->user()->userGameInfos()
+                                                            ->pluck('game_id')
+                                                    )
+                                            )
+                                            ->hiddenOn('edit')
+                                            ->required()
+                                            ->helperText(function () {
+                                                $user = auth()->user();
 
-                                            // Get all game IDs where user has info but NO teams
-                                            $availableGameIds = $user->userGameInfos()
-                                                ->pluck('game_id')
-                                                ->diff(
-                                                    $user->ownedTeams()
-                                                        ->pluck('game_id')
-                                                        ->merge($user->teams()->pluck('game_id'))
-                                                        ->unique()
-                                                );
+                                                // Get all game IDs where user has info but NO teams
+                                                $availableGameIds = $user->userGameInfos()
+                                                    ->pluck('game_id')
+                                                    ->diff(
+                                                        $user->ownedTeams()
+                                                            ->pluck('game_id')
+                                                            ->merge($user->teams()->pluck('game_id'))
+                                                            ->unique()
+                                                    );
 
-                                            // Get actual game names
-                                            $availableGames = Game::whereIn('id', $availableGameIds)->pluck('name');
+                                                // Get actual game names
+                                                $availableGames = Game::whereIn('id', $availableGameIds)->pluck('name');
 
-                                            if ($availableGames->isEmpty()) {
-                                                return $user->userGameInfos()->exists()
-                                                    ? "You already have teams for all games you've added info to!"
-                                                    : "Add your game information first!";
-                                            }
+                                                if ($availableGames->isEmpty()) {
+                                                    return $user->userGameInfos()->exists()
+                                                        ? "You already have teams for all games you've added info to!"
+                                                        : "Add your game information first!";
+                                                }
 
-                                            return "Available games: " . $availableGames->join(', ');
-                                        }),
+                                                return "Available games: " . $availableGames->join(', ');
+                                            }),
 
-                                    Forms\Components\TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255)
-                                        ->columnSpanFull()
-                                        ->placeholder('Enter team full name'),
+                                        Forms\Components\TextInput::make('name')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->columnSpanFull()
+                                            ->placeholder('Enter team full name'),
 
-                                    Forms\Components\Grid::make(2)
-                                        ->schema([
-                                            Forms\Components\TextInput::make('short_name')
-                                                ->placeholder('Team abbreviation')
-                                                ->helperText('Short version of team name (e.g., NYF)'),
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('short_name')
+                                                    ->placeholder('Team abbreviation')
+                                                    ->helperText('Short version of team name (e.g., NYF)'),
 
-                                            Forms\Components\TextInput::make('ingame_team_id')
-                                                ->maxLength(255)
-                                                ->placeholder('In-game identifier')
-                                                ->helperText('Team ID from the game system'),
-                                        ]),
-                                ])
-                        ])
-                        ->columns(1)
+                                                Forms\Components\TextInput::make('ingame_team_id')
+                                                    ->maxLength(255)
+                                                    ->placeholder('In-game identifier')
+                                                    ->helperText('Team ID from the game system'),
+                                            ]),
+                                    ])
+                            ])
+                            ->columns(1),
+
+                        Forms\Components\Section::make('Team Members')
+                            ->hidden(fn($record) => $record ? $record->members->count() == 0 : true)
+                            // ->hiddenOn('create')
+                            ->schema([
+                                Forms\Components\Repeater::make('members')
+                                    ->relationship('members')
+                                    ->simple(
+                                        Forms\Components\TextInput::make('name')
+                                            ->readOnly()
+                                            ->label('Member'),
+                                    )
+                                    ->defaultItems(0)
+                                    ->addable(false)
+                                    ->deletable(false)
+                                    ->columnSpanFull()
+                                    ->extraItemActions([
+                                        Forms\Components\Actions\Action::make('kick')
+                                            ->label('')
+                                            ->tooltip('Remove member immediately')
+                                            ->color('danger')
+                                            ->icon('heroicon-o-user-minus') // Changed to user-minus icon
+                                            ->requiresConfirmation()
+                                            ->modalHeading('Remove Team Member')
+                                            ->modalSubheading('This action will remove the member immediately!')
+                                            ->action(function (array $arguments, Forms\Components\Repeater $component) {
+                                                $state = $component->getState();
+                                                $index = $arguments['item'];
+                                                $userId = $state[$index]['id'];
+                                                // dd($userId);
+                                                $team = $component->getLivewire()->record;
+
+                                                // Use Eloquent relationship
+                                                $team->members()->detach($userId);
+
+                                                // Remove from form state
+                                                unset($state[$index]);
+                                                $component->state(array_values($state));
+
+                                                // Send notifications
+                                                $user = User::find($userId);
+                                                if ($user) {
+                                                    $user->notify(new TeamKickedNotification($team, auth()->user()));
+                                                    FilamentNotification::make()
+                                                        ->title('Member Removed')
+                                                        ->body("{$user->name} was removed immediately")
+                                                        ->success()
+                                                        ->send();
+                                                }
+                                            })
+                                            ->visible(function (array $arguments, Forms\Components\Repeater $component) {
+                                                $state = $component->getState();
+                                                $index = $arguments['item'];
+                                                return isset($state[$index]) &&
+                                                    $state[$index]['user_id'] !== auth()->id();
+                                            })
+                                    ])
+                                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                                        return $data;
+                                    })
+                                    ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                                        return $data;
+                                    })
+                            ])
+                            ->collapsible(),
+                        // New Team Invitations Section
+                        Forms\Components\Section::make('Team Invitations')
+                            ->hidden(fn($record) => $record ? $record->invitations->count() == 0 : true)
+                            ->schema([
+                                Forms\Components\Repeater::make('invitations')
+                                    ->relationship('invitations')
+                                    ->addable(false)
+                                    ->schema([
+                                        Forms\Components\Select::make('recipient_id')
+                                            ->label('Player')
+                                            ->options(User::where('id', '!=', auth()->id())->pluck('name', 'id'))
+                                            ->disabled()
+                                            ->searchable()
+                                            ->required(),
+
+                                        Forms\Components\Select::make('role')
+                                            ->options([
+                                                'player' => 'Player',
+                                                'substitute' => 'Substitute',
+                                            ])
+                                            ->default('player')
+                                            ->disabled()
+                                            ->required(),
+
+                                        Forms\Components\Select::make('status')
+                                            ->options([
+                                                'pending' => 'Pending',
+                                                'accepted' => 'Accepted',
+                                                'declined' => 'Declined',
+                                            ])
+                                            ->default('pending')
+                                            ->disabled()
+                                            ->required(),
+                                    ])
+                                    ->columns(3)
+                                    ->columnSpanFull()
+                                    ->addActionLabel('Add Invitation')
+                                    ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                                        $data['sender_id'] = auth()->id();
+                                        return $data;
+                                    })
+                                    ->reorderable(false)
+                                    ->deleteAction(
+                                        fn(Forms\Components\Actions\Action $action) => $action->requiresConfirmation()
+                                    )
+                            ])
+                            ->collapsible(),
+                    ])
                         ->columnSpan(2),
                 ])->columnSpanFull()->columns(3),
-
-
-                Forms\Components\Section::make('Team Members')
-                    ->hidden(fn($record) => $record ? $record->members->count() == 0 : true)
-                    // ->hiddenOn('create')
-                    ->schema([
-                        Forms\Components\Repeater::make('members')
-                            ->relationship('members')
-                            ->schema([
-                                Forms\Components\Select::make('user_id')
-                                    ->disabled()
-                                    ->label('Member')
-                                    ->options(User::query()->pluck('name', 'user_id'))
-                                    ->searchable()
-                                    ->required(),
-
-                                Forms\Components\Select::make('role')
-                                    ->disabled()
-                                    ->options([
-                                        'player' => 'Player',
-                                        'substitute' => 'Substitute',
-                                    ])
-                                    ->default('player')
-                                    ->required(),
-                            ])
-                            ->defaultItems(0)
-                            ->addable(false)
-                            ->deletable(false)
-                            ->columns(3) // Changed to 3 columns to accommodate the action
-                            ->columnSpanFull()
-                            ->extraItemActions([
-                                Forms\Components\Actions\Action::make('kick')
-                                    ->label('')
-                                    ->tooltip('Remove member immediately')
-                                    ->color('danger')
-                                    ->icon('heroicon-o-user-minus') // Changed to user-minus icon
-                                    ->requiresConfirmation()
-                                    ->modalHeading('Remove Team Member')
-                                    ->modalSubheading('This action will remove the member immediately!')
-                                    ->action(function (array $arguments, Forms\Components\Repeater $component) {
-                                        $state = $component->getState();
-                                        $index = $arguments['item'];
-                                        $userId = $state[$index]['id'];
-                                        // dd($userId);
-                                        $team = $component->getLivewire()->record;
-
-                                        // Use Eloquent relationship
-                                        $team->members()->detach($userId);
-
-                                        // Remove from form state
-                                        unset($state[$index]);
-                                        $component->state(array_values($state));
-
-                                        // Send notifications
-                                        $user = User::find($userId);
-                                        if ($user) {
-                                            $user->notify(new TeamKickedNotification($team, auth()->user()));
-                                            FilamentNotification::make()
-                                                ->title('Member Removed')
-                                                ->body("{$user->name} was removed immediately")
-                                                ->success()
-                                                ->send();
-                                        }
-                                    })
-                                    ->visible(function (array $arguments, Forms\Components\Repeater $component) {
-                                        $state = $component->getState();
-                                        $index = $arguments['item'];
-                                        return isset($state[$index]) &&
-                                            $state[$index]['user_id'] !== auth()->id();
-                                    })
-                            ])
-                            ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
-                                return $data;
-                            })
-                            ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
-                                return $data;
-                            })
-                    ])
-                    ->collapsible(),
-                // New Team Invitations Section
-                Forms\Components\Section::make('Team Invitations')
-                    ->hidden(fn($record) => $record ? $record->invitations->count() == 0 : true)
-                    ->schema([
-                        Forms\Components\Repeater::make('invitations')
-                            ->relationship('invitations')
-                            ->addable(false)
-                            ->schema([
-                                Forms\Components\Select::make('recipient_id')
-                                    ->label('Player')
-                                    ->options(User::where('id', '!=', auth()->id())->pluck('name', 'id'))
-                                    ->disabled()
-                                    ->searchable()
-                                    ->required(),
-
-                                Forms\Components\Select::make('role')
-                                    ->options([
-                                        'player' => 'Player',
-                                        'substitute' => 'Substitute',
-                                    ])
-                                    ->default('player')
-                                    ->disabled()
-                                    ->required(),
-
-                                Forms\Components\Select::make('status')
-                                    ->options([
-                                        'pending' => 'Pending',
-                                        'accepted' => 'Accepted',
-                                        'declined' => 'Declined',
-                                    ])
-                                    ->default('pending')
-                                    ->disabled()
-                                    ->required(),
-                            ])
-                            ->columns(3)
-                            ->columnSpanFull()
-                            ->addActionLabel('Add Invitation')
-                            ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
-                                $data['sender_id'] = auth()->id();
-                                return $data;
-                            })
-                            ->reorderable(false)
-                            ->deleteAction(
-                                fn(Forms\Components\Actions\Action $action) => $action->requiresConfirmation()
-                            )
-                    ])
-                    ->collapsible(),
             ]);
     }
 

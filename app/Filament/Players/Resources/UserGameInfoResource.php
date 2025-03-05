@@ -66,7 +66,7 @@ class UserGameInfoResource extends Resource
                                     ->unique(
                                         table: 'user_game_infos',
                                         column: 'ingame_id',
-                                        modifyRuleUsing: fn($rule, Get $get) => $rule->where('game_id', $get('game_id'))
+                                        modifyRuleUsing: fn($rule, Get $get) => $rule->where('game_id', $get('game_id')), ignoreRecord: true
                                     )
                                     ->hidden(fn(Get $get): bool => !$get('game_id')),
 
