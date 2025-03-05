@@ -181,7 +181,7 @@
                         </svg>
                         Social Connections
                     </h2>
-                    <div class="space-y-2">
+                    <div class="grid grid-cols-1 lg:grid-cols-4">
                         @foreach($user->socials as $social)
                         <a href="{{ $social->link }}" target="_blank" class="flex items-center p-2 sm:p-3 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors">
                             <span class="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center">
