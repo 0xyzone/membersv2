@@ -133,9 +133,9 @@ class ViewTournament extends ViewRecord
 
                     // Notify organizer and players
                     $tournament->user->notify(new TournamentRegistrationNotification($registration));
-                    // $registration->players->each->notify(
-                    //     new TournamentRegistrationNotification($registration)
-                    // );
+                    $registration->players->each->notify(
+                        new TournamentRegistrationNotification($registration)
+                    );
                 })
                 ->visible(function () {
                     return $this->getRecord()->status === 'published' &&
