@@ -10,6 +10,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Validation\ValidationException;
 use App\Filament\Players\Resources\TournamentResource;
 use App\Notifications\TournamentRegistrationNotification;
+use App\Notifications\TournamentPlayersRegistrationNotification;
 
 class ViewTournament extends ViewRecord
 {
@@ -134,7 +135,7 @@ class ViewTournament extends ViewRecord
                     // Notify organizer and players
                     $tournament->user->notify(new TournamentRegistrationNotification($registration));
                     $registration->players->each->notify(
-                        new TournamentRegistrationNotification($registration)
+                        new TournamentPlayersRegistrationNotification($registration)
                     );
                 })
                 ->visible(function () {
