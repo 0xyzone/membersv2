@@ -1,9 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    @php
+    $domain = env('APP_URL'); // Fetch the domain from your Laravel config
+    $imagePath = asset('images/logo-no-background.png'); // Dynamically generate the full URL for the image
+    $faviconPath = asset('favicon.ico'); // Dynamically generate the full URL for the favicon
+    @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vidanta Portal - Champions Arena</title>
+    <title>{{ $pageTitle }}</title>
+    <meta name="description" content="{{ $pageDescription }}">
+    <meta name="author" content="Vidanta Champions Arena">
+    <meta name="keywords" content="esports, gaming, tournaments, Vidanta, Champions Arena, gamers, organizers">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:description" content="{{ $pageDescription }}">
+    <meta property="og:image" content="{{ $imagePath }}">
+    <meta property="og:url" content="{{ $domain }}">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:description" content="{{ $pageDescription }}">
+    <meta name="twitter:image" content="{{ $imagePath }}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ $faviconPath }}">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ $domain }}">
+
     @vite('resources/css/app.css')
     <link rel="stylesheet" href="{{ asset('css/all.css') }}">
     <style>
@@ -20,37 +48,45 @@
                 background-position: 0% 50%;
             }
         }
+
         @keyframes slideDown {
             from {
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
+
         @keyframes slideUp {
             from {
                 opacity: 1;
                 transform: translateY(0);
             }
+
             to {
                 opacity: 0;
                 transform: translateY(-10px);
             }
         }
+
         .dropdown-enter {
             animation: slideDown 0.3s ease forwards;
         }
+
         .dropdown-exit {
             animation: slideUp 0.3s ease forwards;
         }
+
         .button-hover:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(125, 60, 237, 0.4);
             transition: all 0.3s ease;
         }
+
         .arena-gradient {
             background: linear-gradient(135deg, #1a1b2d, #2d1a2d, #1a2d2d);
             background-size: 400% 400%;
