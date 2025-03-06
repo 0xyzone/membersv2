@@ -39,6 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->databaseNotifications()
+            ->favicon(asset('favicon.png'))
             ->emailVerification()
             ->colors([
                 'primary' => Color::Teal,

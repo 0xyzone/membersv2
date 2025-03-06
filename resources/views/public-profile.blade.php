@@ -29,7 +29,7 @@
     <meta name="author" content="{{ $user->username }}">
     <meta name="keywords" content="esports, gaming profile, {{ $user->username }}, {{ implode(', ', $user->userGameInfos->pluck('game.name')->toArray()) }}">
     <link rel="canonical" href="{{ url()->current() }}">
-
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gradient-to-br from-slate-900 to-black min-h-screen">

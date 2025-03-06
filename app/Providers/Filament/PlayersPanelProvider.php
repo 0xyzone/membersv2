@@ -41,6 +41,7 @@ class PlayersPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Violet,
             ])
+            ->favicon(asset('favicon.png'))
             ->defaultThemeMode(ThemeMode::Dark)
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()

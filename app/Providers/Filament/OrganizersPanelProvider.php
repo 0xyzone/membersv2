@@ -43,6 +43,7 @@ class OrganizersPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->favicon(asset('favicon.png'))
             ->defaultThemeMode(ThemeMode::Dark)
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()
