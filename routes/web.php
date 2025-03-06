@@ -9,7 +9,7 @@ use App\Http\Controllers\PublicProfileController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 Route::get('/invitation/{team}/{action}', HandleInvitationAction::class)
     ->name('invitation.action');
