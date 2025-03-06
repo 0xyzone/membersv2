@@ -29,7 +29,7 @@
     <meta name="author" content="{{ $user->username }}">
     <meta name="keywords" content="esports, gaming profile, {{ $user->username }}, {{ implode(', ', $user->userGameInfos->pluck('game.name')->toArray()) }}">
     <link rel="canonical" href="{{ url()->current() }}">
-    
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gradient-to-br from-slate-900 to-black min-h-screen">
@@ -78,7 +78,7 @@
                         </svg>
                         Player Profile
                     </h2>
-                    <div class="grid grid-cols-1 gap-4 text-base text-slate-300">
+                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 text-base text-slate-300">
                         <!-- Increased text size and spacing -->
                         @if($user->gender)
                         <div class="flex items-center">
