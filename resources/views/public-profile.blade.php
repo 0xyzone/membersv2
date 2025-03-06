@@ -195,6 +195,6 @@
             </div>
         </div>
     </div>
-    <script src="http://mv2/js/solutionforest/filament-simplelightbox/filament-simplelightbox-scripts.js?v=3.2.137.0"></script>
+    <script src="https://mv2/js/solutionforest/filament-simplelightbox/filament-simplelightbox-scripts.js?v=3.2.137.0"></script>
 </body>
 </html>
