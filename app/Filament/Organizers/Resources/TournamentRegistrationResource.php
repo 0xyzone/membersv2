@@ -22,6 +22,7 @@ use Filament\Infolists\Components\RepeatableEntry;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Organizers\Resources\TournamentRegistrationResource\Pages;
 use App\Filament\Organizers\Resources\TournamentRegistrationResource\RelationManagers;
+use Str;
 
 class TournamentRegistrationResource extends Resource
 {
@@ -135,7 +136,8 @@ class TournamentRegistrationResource extends Resource
                                             ->weight('medium')
                                             ->color('primary')
                                             ->default('N/a'),
-                                        TextEntry::make('current_address')
+                                        TextEntry::make('gender')
+                                        ->formatStateUsing(fn($state) => Str::ucfirst($state))
                                             ->weight('medium')
                                             ->color('primary')
                                             ->default('N/a')
