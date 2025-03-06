@@ -40,8 +40,8 @@
             <!-- Added max-width constraint -->
             <!-- Banner Section -->
             <div class="h-32 sm:h-48 bg-gradient-to-r from-purple-600 to-blue-600 relative">
-                <div class="absolute -bottom-8 sm:-bottom-16 left-4 sm:left-6" x-on:click="SimpleLightBox.open(event, '')">
-                    <img src="{{ $user->avatar_url ? asset('storage/' . $user->avatar_url) : asset('images/esports-default-avatar.png') }}" class="w-20 h-20 sm:w-32 sm:h-32 rounded-full border-4 border-slate-800 shadow-lg bg-slate-900 simple-light-box-img-indicator"> <!-- Increased mobile avatar size -->
+                <div class="absolute -bottom-8 sm:-bottom-16 left-4 sm:left-6">
+                    <img src="{{ $user->avatar_url ? asset('storage/' . $user->avatar_url) : asset('images/esports-default-avatar.png') }}" class="w-20 h-20 sm:w-32 sm:h-32 rounded-full border-4 border-slate-800 shadow-lg bg-slate-900"> <!-- Increased mobile avatar size -->
                 </div>
             </div>
 
@@ -195,6 +195,6 @@
             </div>
         </div>
     </div>
-    <script src="https://mv2/js/solutionforest/filament-simplelightbox/filament-simplelightbox-scripts.js?v=3.2.137.0"></script>
+    <script src="http://mv2/js/solutionforest/filament-simplelightbox/filament-simplelightbox-scripts.js?v=3.2.137.0"></script>
 </body>
 </html>
