@@ -43,6 +43,7 @@ class OrganizersPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->brandLogo(asset('images/logo-no-background.png'))
             ->favicon(asset('favicon.png'))
             ->defaultThemeMode(ThemeMode::Dark)
             ->maxContentWidth(MaxWidth::Full)

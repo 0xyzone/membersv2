@@ -39,6 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->databaseNotifications()
+            ->brandLogo(asset('images/logo-no-background.png'))
             ->favicon(asset('favicon.png'))
             ->emailVerification()
             ->colors([

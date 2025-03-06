@@ -41,6 +41,7 @@ class PlayersPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Violet,
             ])
+            ->brandLogo(asset('images/logo-no-background.png'))
             ->favicon(asset('favicon.png'))
             ->defaultThemeMode(ThemeMode::Dark)
             ->maxContentWidth(MaxWidth::Full)
