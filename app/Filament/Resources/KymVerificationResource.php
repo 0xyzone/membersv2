@@ -46,47 +46,47 @@ class KymVerificationResource extends Resource
         return $infolist
             ->schema([
                 Section::make('Personal Information')
-                ->columns(2)
-                ->schema([
-                    TextEntry::make('user.name')->label('Full Name'),
-                    TextEntry::make('user.username')->label('Username'),
-                    TextEntry::make('user.gender')->label('Gender'),
-                    TextEntry::make('user.date_of_birth')->label('Date of Birth')->date(),
-                    TextEntry::make('user.email')->label('Email Address')->copyable(),
-                    TextEntry::make('user.primary_contact_number')->label('Primary Contact')->copyable(),
-                    TextEntry::make('user.secondary_contact_number')->label('Secondary Contact')->copyable()->hidden(fn ($record) => !$record->user->secondary_contact_number),
-                ]),
+                    ->columns(2)
+                    ->schema([
+                        TextEntry::make('user.name')->label('Full Name'),
+                        TextEntry::make('user.username')->label('Username'),
+                        TextEntry::make('user.gender')->label('Gender'),
+                        TextEntry::make('user.date_of_birth')->label('Date of Birth')->date(),
+                        TextEntry::make('user.email')->label('Email Address')->copyable(),
+                        TextEntry::make('user.primary_contact_number')->label('Primary Contact')->copyable(),
+                        TextEntry::make('user.secondary_contact_number')->label('Secondary Contact')->copyable()->hidden(fn($record) => !$record->user->secondary_contact_number),
+                    ]),
 
-            Section::make('Address Details')
-                ->columns(1)
-                ->schema([
-                    TextEntry::make('user.current_address')->label('Current Address')->markdown(),
-                    TextEntry::make('user.permanent_address')->label('Permanent Address')->markdown(),
-                ]),
+                Section::make('Address Details')
+                    ->columns(1)
+                    ->schema([
+                        TextEntry::make('user.current_address')->label('Current Address')->markdown(),
+                        TextEntry::make('user.permanent_address')->label('Permanent Address')->markdown(),
+                    ]),
 
-            Section::make('Verification Details')
-                ->columns(2)
-                ->schema([
-                    TextEntry::make('user.verification_document_number')->label('Document Number')->copyable(),
-                    TextEntry::make('user.verification_document_issue_date')->label('Issue Date')->date(),
-                    TextEntry::make('user.verification_document_expiry_date')->label('Expiry Date')->date()->hidden(fn ($record) => !$record->user->verification_document_expiry_date),
-                    ImageEntry::make('user.verification_document_image_path')->label('Document Image')->url(fn ($record) => asset($record->user->verification_document_image_path))->openUrlInNewTab()
-                    ->simpleLightbox(),
-                ]),
+                Section::make('Verification Details')
+                    ->columns(2)
+                    ->schema([
+                        TextEntry::make('user.verification_document_number')->label('Document Number')->copyable(),
+                        TextEntry::make('user.verification_document_issue_date')->label('Issue Date')->date(),
+                        TextEntry::make('user.verification_document_expiry_date')->label('Expiry Date')->date()->hidden(fn($record) => !$record->user->verification_document_expiry_date),
+                        ImageEntry::make('user.verification_document_image_path')->label('Document Image')->url(fn($record) => asset($record->user->verification_document_image_path))->openUrlInNewTab()
+                            ->simpleLightbox(),
+                    ]),
 
-            Section::make('Account Information')
-                ->columns(2)
-                ->schema([
-                    TextEntry::make('user.is_verified')->label('Verification Status')
-                        ->badge()
-                        ->formatStateUsing(fn ($state) => $state ? 'Verified' : 'Not Verified')
-                        ->color(fn ($state) => $state ? 'success' : 'danger'),
-                    TextEntry::make('user.is_active')->label('Account Status')
-                        ->badge()
-                        ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive')
-                        ->color(fn ($state) => $state ? 'success' : 'danger'),
-                    TextEntry::make('user.created_at')->label('Joined On')->dateTime(),
-                ]),
+                Section::make('Account Information')
+                    ->columns(2)
+                    ->schema([
+                        TextEntry::make('user.is_verified')->label('Verification Status')
+                            ->badge()
+                            ->formatStateUsing(fn($state) => $state ? 'Verified' : 'Not Verified')
+                            ->color(fn($state) => $state ? 'success' : 'danger'),
+                        TextEntry::make('user.is_active')->label('Account Status')
+                            ->badge()
+                            ->formatStateUsing(fn($state) => $state ? 'Active' : 'Inactive')
+                            ->color(fn($state) => $state ? 'success' : 'danger'),
+                        TextEntry::make('user.created_at')->label('Joined On')->dateTime(),
+                    ]),
             ]);
     }
 
@@ -110,6 +110,7 @@ class KymVerificationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn(Builder $query) => $query->where('status', '!=', 'approved'))
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
@@ -119,9 +120,9 @@ class KymVerificationResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('reason')
-                ->limit(50),
+                    ->limit(50),
                 Tables\Columns\TextColumn::make('approved_at')
-                ->date(),
+                    ->date(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
