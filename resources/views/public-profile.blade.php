@@ -108,7 +108,7 @@
                 </div>
 
                 <!-- Game Stats Section -->
-                <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 my-6">
                     <!-- Simplified grid -->
                     @foreach($user->userGameInfos as $gameInfo)
                     <div class="bg-slate-900 p-4 rounded-xl">
@@ -139,7 +139,7 @@
                         Team Affiliations
                     </h2>
 
-                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <!-- Changed to vertical stack -->
                         @foreach($user->ownedTeams as $team)
                         <div class="bg-slate-800 p-4 rounded-xl">
