@@ -20,6 +20,7 @@ class ViewKymVerification extends ViewRecord
         return [
             // Approve Action
             Action::make('approve')
+                ->visible(fn() => $this->record->status !== 'approved')
                 ->label('Approve')
                 ->color('success')
                 ->icon('heroicon-o-check-circle')
@@ -33,6 +34,7 @@ class ViewKymVerification extends ViewRecord
 
             // Needs Revision Action
             Action::make('needs_revision')
+                ->visible(fn() => $this->record->status !== 'approved')
                 ->label('Needs Revision')
                 ->color('warning')
                 ->icon('heroicon-o-pencil')
@@ -48,6 +50,7 @@ class ViewKymVerification extends ViewRecord
 
             // Decline Action
             Action::make('decline')
+                ->visible(fn() => $this->record->status !== 'approved')
                 ->label('Decline')
                 ->color('danger')
                 ->icon('heroicon-o-x-circle')
