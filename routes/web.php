@@ -10,6 +10,18 @@ use App\Http\Controllers\PublicProfileController;
 Route::get('/', function () {
     $pageTitle = "Vidanta Portal - Champions Arena";
     $pageDescription = "Join Vidanta Champions Arena, the ultimate esports platform for gamers and tournament organizers. Compete in epic tournaments, manage teams, and build your legacy.";
+    $user = auth()->user();
+    if($user) {
+        if($user->hasRole(['players'])) {
+            return redirect(route('filament.players.auth.login'));
+        }
+        if($user->hasRole(['admin'])) {
+            return redirect(route('filament.admin.auth.login'));
+        }
+        if($user->hasRole(['organizers'])) {
+            return redirect(route('filament.organizers.auth.login'));
+        }
+    }
     return view('welcome', compact('pageTitle', 'pageDescription'));
 })->name('home');
 
