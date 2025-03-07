@@ -114,7 +114,7 @@
                     <div class="bg-slate-900 p-4 rounded-xl">
                         <div class="flex items-center gap-4">
                             @if($gameInfo->game->image_path)
-                            <img src="{{ asset('storage/' . $gameInfo->game->image_path) }}" alt="{{ $gameInfo->game->name }} Logo" class="w-16 h-16 rounded-xl bg-slate-800 p-2">
+                            <img src="{{ asset('storage/' . $gameInfo->game->image_path) }}" alt="{{ $gameInfo->game->name }} Logo" class="w-16 h-16 rounded-xl bg-slate-800 p-2 object-scale-down">
                             @endif
                             <div>
                                 <div class="text-lg font-bold text-purple-400">{{ $gameInfo->ingame_name }}</div>
