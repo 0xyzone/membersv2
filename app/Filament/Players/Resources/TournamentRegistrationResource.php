@@ -4,12 +4,14 @@ namespace App\Filament\Players\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Forms\Get;
 use App\Models\UserTeam;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\View;
+use Filament\Forms\Components\Hidden;
 use App\Models\TournamentRegistration;
 use Filament\Infolists\Components\Grid;
 use Illuminate\Database\Eloquent\Model;
@@ -40,7 +42,10 @@ class TournamentRegistrationResource extends Resource
 
     public static function canEdit(Model $model): bool
     {
-        return false;
+        $userId = auth()->id();
+
+        // Check if the user is the team owner
+        return $model->team->user_id === $userId;
     }
 
     public static function canView(Model $model): bool
@@ -64,7 +69,9 @@ class TournamentRegistrationResource extends Resource
             ->schema([
                 \Filament\Forms\Components\Select::make('team_id')
                     ->label('Select Team')
+                    ->columnSpanFull()
                     ->required()
+                    ->disabledOn('edit')
                     ->options(function (TournamentRegistration $record) {
                         $tournament = $record->tournament;
                         $teams = auth()->user()->ownedTeams()
@@ -83,29 +90,54 @@ class TournamentRegistrationResource extends Resource
                     })
                     // ->hidden(fn(TournamentRegistration $record) => !$record->userHasEligibleTeams())
                     ->live()
+                    ->afterStateHydrated(function ($component, TournamentRegistration $record) {
+                        // Force refresh team relation
+                        $record->load('team');
+                        $component->state($record->team_id);
+                    })
                     ->afterStateUpdated(function ($state, \Filament\Forms\Set $set) {
-                        $set('selected_members', []);
+                        $set('players', []);
                     }),
 
-                \Filament\Forms\Components\CheckboxList::make('selected_members')
-                    ->label('Select Participating Players')
-                    ->options(function (\Filament\Forms\Get $get) {
-                        $team = UserTeam::find($get('team_id'));
-                        return $team?->members()
-                            ->wherePivot('role', 'player') // Only allow players (not substitutes)
-                            ->pluck('name', 'user_team_members.user_id')
+                // \Filament\Forms\Components\TextInput::make('user_team_id')
+                //     ->default(fn(Get $get) => $get('team_id')),
+
+                \Filament\Forms\Components\CheckboxList::make('players')
+                    ->hint(fn($record) => 'Minimum: ' . $record->tournament->min_team_players . ', Max: ' . $record->tournament->max_team_players . ' players to be selected!')
+                    ->label('Participating Players')
+                    ->relationship('players', 'id')
+                    ->options(function (TournamentRegistration $record) {
+                        $team = $record->team;
+
+                        $owner = [
+                            (string) $team->user_id => $team->owner->name . ' (Owner)'
+                        ];
+
+                        $players = $team->members()
+                            ->wherePivot('role', 'player')
+                            ->get()
+                            ->mapWithKeys(fn($user) => [
+                                (string) $user->id => $user->name
+                            ])
                             ->toArray();
+
+                        return $owner + $players;
                     })
+                    ->columns(3)
+                    ->columnSpanFull()
                     ->required()
-                    ->rule(function (\Filament\Forms\Get $get) {
-                        $tournament = $this->getRecord();
+                    ->pivotData(function (Get $get, TournamentRegistration $record) {
                         return [
-                            'array',
-                            'min:' . $tournament->min_team_players,
-                            'max:' . $tournament->max_team_players,
+                            'user_team_id' => $record->team_id ?? $get('team_id'),
                         ];
                     })
-                    ->hidden(fn(\Filament\Forms\Get $get) => !$get('team_id'))
+                    ->rule(function (TournamentRegistration $record) {
+                        return [
+                            'array',
+                            'min:' . $record->tournament->fresh()->min_team_players,
+                            'max:' . $record->tournament->fresh()->max_team_players,
+                        ];
+                    })
                     ->validationMessages([
                         'min' => 'Minimum :min players required',
                         'max' => 'Maximum :max players allowed',
@@ -273,6 +305,7 @@ class TournamentRegistrationResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

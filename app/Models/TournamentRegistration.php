@@ -13,7 +13,8 @@ class TournamentRegistration extends Model
         return $this->belongsToMany(User::class, 'tournament_registration_players',
         'registration_id', // Correct foreign key for the registration
         'user_id')
-        ->with('userGameInfos');
+        ->with('userGameInfos')
+        ->withTimestamps();
     }
 
     public function team()
