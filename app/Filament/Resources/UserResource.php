@@ -63,6 +63,7 @@ class UserResource extends Resource
                 IngoSplit::make([
                     ImageEntry::make('avatar_url')
                         ->label('')
+                        ->simpleLightbox()
                         ->size(150)
                         ->circular()
                         ->grow(false)
