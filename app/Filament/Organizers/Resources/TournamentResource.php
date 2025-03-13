@@ -2,18 +2,19 @@
 
 namespace App\Filament\Organizers\Resources;
 
-use App\Filament\Components\CustomFileUpload;
 use Filament\Forms;
-use Filament\Forms\Components\FileUpload;
 use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Form;
+use Filament\Pages\Page;
 use App\Models\Tournament;
 use Filament\Tables\Table;
 use App\Enums\TournamentTypes;
 use Filament\Resources\Resource;
 use App\Enums\TournamentPlatforms;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Components\CustomFileUpload;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Organizers\Resources\TournamentResource\Pages;
 use App\Filament\Organizers\Resources\TournamentResource\RelationManagers;
@@ -291,6 +292,12 @@ class TournamentResource extends Resource
                     ->weight('medium')
                     ->wrap(),
 
+                // Owner
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Owner')
+                    ->description(fn(Tournament $record) => '@' . $record->user->username)
+                    ->searchable(),
+
                 // Schedule
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('Tournament Dates')
@@ -371,6 +378,7 @@ class TournamentResource extends Resource
                     ->options(TournamentTypes::filamentOptions()),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -393,6 +401,14 @@ class TournamentResource extends Resource
             'index' => Pages\ListTournaments::route('/'),
             'create' => Pages\CreateTournament::route('/create'),
             'edit' => Pages\EditTournament::route('/{record}/edit'),
+            'view' => Pages\ViewTournament::route('/{record}'),
         ];
+    }
+    public static function getRecordSubNavigation(Page $page): array
+    {
+        return $page->generateNavigationItems([
+            Pages\ViewTournament::class,
+            Pages\EditTournament::class,
+        ]);
     }
 }

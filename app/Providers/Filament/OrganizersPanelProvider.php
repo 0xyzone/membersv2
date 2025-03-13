@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use Filament\Pages;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Panel;
 use Filament\Widgets;
 use App\Events\Registered;
@@ -46,6 +47,7 @@ class OrganizersPanelProvider extends PanelProvider
             ->brandLogo(asset('images/logo-no-background.png'))
             ->favicon(asset('favicon.png'))
             ->defaultThemeMode(ThemeMode::Dark)
+            ->topNavigation()
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament/organizers/theme.css')

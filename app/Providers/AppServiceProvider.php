@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
             'medium_gray' => Color::GRAY_300,
         ]);
         FilamentView::registerRenderHook(
-            PanelsRenderHook::TOPBAR_START,
+            PanelsRenderHook::GLOBAL_SEARCH_AFTER,
             fn (): string => Blade::render('
             <div class="hidden lg:flex items-center space-x-2">
                 <p>Signed in as: <span class="font-bold text-primary-500">{{ $user->name }}</span> | <span class="font-bold text-primary-500">{{ $user->email }}</span></p>
