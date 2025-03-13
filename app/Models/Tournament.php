@@ -35,12 +35,12 @@ class Tournament extends Model
         return $this->hasMany(TournamentRegistration::class);
     }
 
-    
+
     public function getPlayerRequirementsAttribute()
     {
         return "{$this->min_team_players}-{$this->max_team_players} players";
     }
-    
+
     public function teams()
     {
         return $this->belongsToMany(
@@ -50,7 +50,7 @@ class Tournament extends Model
             'team_id'
         )->where('status', "approved");
     }
-    
+
     protected $withCount = ['teams', 'registrations'];
     protected $casts = [
         'meta_tags' => 'array',
@@ -59,4 +59,9 @@ class Tournament extends Model
         'registration_start_date' => 'date',
         'registration_end_date' => 'date',
     ];
+
+    public function moderators()
+    {
+        return $this->hasMany(TournamentModerator::class);
+    }
 }

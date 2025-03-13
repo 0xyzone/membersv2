@@ -3,6 +3,7 @@
 namespace App\Filament\Organizers\Resources;
 
 use Filament\Forms;
+use App\Models\User;
 use Filament\Tables;
 use Filament\Forms\Get;
 use Filament\Forms\Form;
@@ -15,6 +16,7 @@ use App\Enums\TournamentPlatforms;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Components\CustomFileUpload;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Organizers\Resources\TournamentResource\Pages;
 use App\Filament\Organizers\Resources\TournamentResource\RelationManagers;
@@ -26,6 +28,15 @@ class TournamentResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-trophy';
     protected static ?string $activeNavigationIcon = 'heroicon-s-trophy';
     protected static ?string $navigationGroup = 'Tournament Management';
+
+    public static function canEdit(Model $model): bool
+    {
+        return $model->user_id === auth()->id() ||
+            $model->moderators()
+                ->where('user_id', auth()->id())
+                ->where('role', 'admin')
+                ->exists();
+    }
 
     public static function form(Form $form): Form
     {
@@ -205,6 +216,7 @@ class TournamentResource extends Resource
 
                         // Settings & Visibility Tab
                         Forms\Components\Tabs\Tab::make('Settings')
+                            ->icon('heroicon-o-cog-6-tooth')
                             ->columns(3)
                             ->schema([
                                 Forms\Components\Section::make('Visibility')
@@ -266,6 +278,45 @@ class TournamentResource extends Resource
                                             ->maxLength(255),
                                     ]),
                             ]),
+                        Forms\Components\Tabs\Tab::make('Moderators')
+                            ->icon('heroicon-o-shield-check')
+                            ->schema([
+                                Forms\Components\Repeater::make('moderators')
+                                    ->relationship('moderators')
+                                    ->schema([
+                                        Forms\Components\Select::make('user_id')
+                                            ->label('Moderator')
+                                            ->required()
+                                            ->searchable()
+                                            ->options(function () {
+                                                return User::whereHas('moderatorsAdded', fn($q) => $q->where('user_id', auth()->id()))
+                                                    ->pluck('name', 'id');
+                                            })
+                                            ->getSearchResultsUsing(
+                                                fn(string $search) =>
+                                                User::whereHas('moderatorsAdded', fn($q) => $q->where('user_id', auth()->id()))
+                                                    ->where(fn($q) => $q->where('name', 'like', "%$search%")
+                                                        ->orWhere('email', 'like', "%$search%")
+                                                        ->orWhere('id', $search))
+                                                    ->limit(50)
+                                                    ->get()
+                                                    ->pluck('name', 'id')
+                                            ),
+
+                                        Forms\Components\Select::make('role') // Remove pivot. prefix
+                                            ->options([
+                                                'admin' => 'Admin',
+                                                'moderator' => 'Moderator',
+                                            ])
+                                            ->default('moderator')
+                                            ->required()
+                                    ])
+                                    ->columns(2)
+                                    ->columnSpanFull()
+                                    ->itemLabel(fn(array $state): ?string =>
+                                        User::find($state['user_id'])?->name . ' - ' . ($state['role'] ?? 'moderator'))
+                            ])
+
                     ])
                     ->columnSpanFull()
                     ->persistTabInQueryString(),
@@ -275,7 +326,15 @@ class TournamentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn(Builder $query) => $query->where('user_id', auth()->user()->id))
+            ->modifyQueryUsing(
+                fn(Builder $query) => $query
+                    ->where('user_id', auth()->id())
+                    ->orWhereHas(
+                        'moderators',
+                        fn($q) =>
+                        $q->where('user_id', auth()->id())
+                    )
+            )
             ->columns([
                 // Logo Column
                 Tables\Columns\ImageColumn::make('logo_image_path')

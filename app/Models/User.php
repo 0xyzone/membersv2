@@ -7,6 +7,8 @@ use Filament\Panel;
 use App\Models\Social;
 use App\Models\Document;
 use App\Models\UserTeam;
+use App\Models\Moderator;
+use App\Models\Tournament;
 use App\Models\UserSocial;
 use Illuminate\Support\Str;
 use App\Models\UserGameInfo;
@@ -168,5 +170,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     public function tournamentRegistrations()
     {
         return $this->belongsToMany(TournamentRegistration::class, 'tournament_registration_players');
+    }
+
+    public function moderatedTournaments()
+    {
+        return $this->belongsToMany(Tournament::class, 'tournament_moderators')
+            ->withPivot('role');
+    }
+
+    public function moderatorsAdded()
+    {
+        return $this->hasMany(Moderator::class, 'moderator_id', 'id');
     }
 }

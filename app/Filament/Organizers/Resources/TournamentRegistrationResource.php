@@ -41,6 +41,14 @@ class TournamentRegistrationResource extends Resource
         return false;
     }
 
+    public static function canView(Model $record): bool
+    {
+        return $record->tournament->user_id === auth()->id() ||
+            $record->tournament->moderators()
+                ->where('user_id', auth()->id())
+                ->exists();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -132,12 +140,12 @@ class TournamentRegistrationResource extends Resource
                                             ->weight('medium')
                                             ->default('N/a'),
                                         TextEntry::make('primary_contact_number')
-                                        ->label('Contact')
+                                            ->label('Contact')
                                             ->weight('medium')
                                             ->color('primary')
                                             ->default('N/a'),
                                         TextEntry::make('gender')
-                                        ->formatStateUsing(fn($state) => Str::ucfirst($state))
+                                            ->formatStateUsing(fn($state) => Str::ucfirst($state))
                                             ->weight('medium')
                                             ->color('primary')
                                             ->default('N/a')
@@ -157,8 +165,8 @@ class TournamentRegistrationResource extends Resource
                                                 ->modalSubmitAction(false)
                                                 ->modalCancelAction(false)
                                         ])
-                                        ->alignCenter()
-                                        ->extraAttributes(['class' => 'flex items-center justify-center h-full']),
+                                            ->alignCenter()
+                                            ->extraAttributes(['class' => 'flex items-center justify-center h-full']),
                                     ])
                             ])
                             ->columns(1)
@@ -192,9 +200,11 @@ class TournamentRegistrationResource extends Resource
     {
         return $table
             ->modifyQueryUsing(function (Builder $query) {
-                // Filter registrations for tournaments organized by the logged-in user
                 $query->whereHas('tournament', function ($q) {
-                    $q->where('user_id', auth()->id());
+                    $q->where('user_id', auth()->id())
+                        ->orWhereHas('moderators', function ($q) {
+                            $q->where('user_id', auth()->id());
+                        });
                 });
             })
             ->columns([

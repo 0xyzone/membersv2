@@ -47,7 +47,6 @@ class OrganizersPanelProvider extends PanelProvider
             ->brandLogo(asset('images/logo-no-background.png'))
             ->favicon(asset('favicon.png'))
             ->defaultThemeMode(ThemeMode::Dark)
-            ->topNavigation()
             ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament/organizers/theme.css')
