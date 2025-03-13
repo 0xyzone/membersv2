@@ -2,12 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\User;
 use App\Models\Tournament;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class TournamentModerator extends Model
+class TournamentModerator extends Pivot
 {
+    protected $table = 'tournament_moderators';
+    
+    protected $fillable = [
+        'tournament_id',
+        'user_id',
+        'role'
+    ];
+
     /**
      * Get the tournament that owns the TournamentModerator
      *
@@ -27,7 +36,7 @@ class TournamentModerator extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     protected $casts = [
         'role' => 'string',
     ];

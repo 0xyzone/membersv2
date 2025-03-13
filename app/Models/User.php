@@ -175,6 +175,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     public function moderatedTournaments()
     {
         return $this->belongsToMany(Tournament::class, 'tournament_moderators')
+            ->using(TournamentModerator::class)
             ->withPivot('role');
     }
 

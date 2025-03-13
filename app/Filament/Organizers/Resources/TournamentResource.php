@@ -297,7 +297,7 @@ class TournamentResource extends Resource
                                             ->searchable()
                                             ->options(function () {
                                                 return User::whereHas('moderatorsAdded', fn($q) => $q->where('user_id', auth()->id()))
-                                                    ->pluck('name', 'user_id');
+                                                    ->pluck('name', 'id');
                                             })
                                             ->getSearchResultsUsing(
                                                 fn(string $search) =>
@@ -307,10 +307,12 @@ class TournamentResource extends Resource
                                                         ->orWhere('id', $search))
                                                     ->limit(50)
                                                     ->get()
-                                                    ->pluck('name', 'user_id')
-                                            ),
+                                                    ->pluck('name', 'id')
+                                            )
+                                            ->live(),
 
-                                        Forms\Components\Select::make('role') // Remove pivot. prefix
+                                        // Add pivot data handling for role
+                                        Forms\Components\Select::make('role')
                                             ->options([
                                                 'admin' => 'Admin',
                                                 'moderator' => 'Moderator',
@@ -321,7 +323,7 @@ class TournamentResource extends Resource
                                     ->columns(2)
                                     ->columnSpanFull()
                                     ->itemLabel(fn(array $state): ?string =>
-                                        User::find($state['user_id'])?->name . ' - ' . ($state['role'] ?? 'moderator'))
+                                        User::find($state['user_id'])?->name . ' - ' . ($state['pivot']['role'] ?? 'moderator'))
                             ])
 
                     ])

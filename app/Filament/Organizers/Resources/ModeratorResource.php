@@ -73,6 +73,8 @@ class ModeratorResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn(Builder $query) => $query
+                ->where('user_id', auth()->user()->id))
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Added by')
@@ -109,7 +111,9 @@ class ModeratorResource extends Resource
                         // Remove from tournaments owned by this organizer
                         Tournament::where('user_id', $organizerId)
                             ->each(function ($tournament) use ($moderatorUserId) {
-                            $tournament->moderators()->detach($moderatorUserId);
+                            $tournament->moderators()
+                                ->where('user_id', $moderatorUserId)
+                                ->delete();
                         });
                         $moderator = $record->moderator;
                         Notification::make()
