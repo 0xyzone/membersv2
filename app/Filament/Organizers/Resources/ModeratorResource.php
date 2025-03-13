@@ -7,10 +7,11 @@ use App\Models\User;
 use Filament\Tables;
 use Filament\Forms\Form;
 use App\Models\Moderator;
+use App\Models\Tournament;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
 use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -74,12 +75,14 @@ class ModeratorResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
+                    ->label('Added by')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('moderator.name')
-                    ->label('Name'),
+                    ->label('Name')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('moderator.email')
-                    ->label('Email'),
+                    ->label('Email')
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -99,6 +102,15 @@ class ModeratorResource extends Resource
                     ->label('Kick')
                     ->icon('heroicon-o-no-symbol')
                     ->after(function ($record) {
+                        // Get the organizer who added this moderator
+                        $organizerId = $record->user_id;
+                        $moderatorUserId = $record->moderator_id;
+
+                        // Remove from tournaments owned by this organizer
+                        Tournament::where('user_id', $organizerId)
+                            ->each(function ($tournament) use ($moderatorUserId) {
+                            $tournament->moderators()->detach($moderatorUserId);
+                        });
                         $moderator = $record->moderator;
                         Notification::make()
                             ->title('You\'ve been kicked as a moderator')

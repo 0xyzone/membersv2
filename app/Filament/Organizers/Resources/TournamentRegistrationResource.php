@@ -2,10 +2,12 @@
 
 namespace App\Filament\Organizers\Resources;
 
+use Str;
 use Filament\Forms;
 use App\Models\User;
 use Filament\Tables;
 use Filament\Forms\Form;
+use App\Models\Tournament;
 use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -22,7 +24,6 @@ use Filament\Infolists\Components\RepeatableEntry;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Organizers\Resources\TournamentRegistrationResource\Pages;
 use App\Filament\Organizers\Resources\TournamentRegistrationResource\RelationManagers;
-use Str;
 
 class TournamentRegistrationResource extends Resource
 {
@@ -222,7 +223,19 @@ class TournamentRegistrationResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('tournament')
+                    ->relationship('tournament', 'name')
+                    ->searchable()
+                    ->visible(function () {
+                        $user = auth()->user();
+
+                        // Get count of tournaments user has access to
+                        $tournamentCount = Tournament::where('user_id', $user->id)
+                            ->orWhereHas('moderators', fn($q) => $q->where('user_id', $user->id))
+                            ->count();
+
+                        return $tournamentCount > 0; // Show filter if any tournaments exist
+                    })
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

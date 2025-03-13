@@ -43,9 +43,13 @@ class TournamentResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Tabs::make('TournamentFormTabs')
+                    ->id('tournament-tabs')
+                    ->persistTab()
+                    ->persistTabInQueryString()
                     ->tabs([
                         // General Information Tab
                         Forms\Components\Tabs\Tab::make('General')
+                            ->icon('heroicon-o-trophy')
                             ->columns(3)
                             ->schema([
                                 Forms\Components\Section::make('Basic Information')
@@ -107,6 +111,7 @@ class TournamentResource extends Resource
 
                         // Schedule & Structure Tab
                         Forms\Components\Tabs\Tab::make('Schedule & Structure')
+                            ->icon('heroicon-o-calendar-date-range')
                             ->columns(3)
                             ->schema([
                                 Forms\Components\Section::make('Dates & Timing')
@@ -166,6 +171,7 @@ class TournamentResource extends Resource
 
                         // Organizer & Content Tab
                         Forms\Components\Tabs\Tab::make('Details')
+                            ->icon('heroicon-o-information-circle')
                             ->columns(3)
                             ->schema([
                                 Forms\Components\Section::make('Organizer Information')
@@ -279,6 +285,7 @@ class TournamentResource extends Resource
                                     ]),
                             ]),
                         Forms\Components\Tabs\Tab::make('Moderators')
+                            ->visible(fn($record): bool => $record->user_id === auth()->user()->id)
                             ->icon('heroicon-o-shield-check')
                             ->schema([
                                 Forms\Components\Repeater::make('moderators')
@@ -290,7 +297,7 @@ class TournamentResource extends Resource
                                             ->searchable()
                                             ->options(function () {
                                                 return User::whereHas('moderatorsAdded', fn($q) => $q->where('user_id', auth()->id()))
-                                                    ->pluck('name', 'id');
+                                                    ->pluck('name', 'user_id');
                                             })
                                             ->getSearchResultsUsing(
                                                 fn(string $search) =>
@@ -300,7 +307,7 @@ class TournamentResource extends Resource
                                                         ->orWhere('id', $search))
                                                     ->limit(50)
                                                     ->get()
-                                                    ->pluck('name', 'id')
+                                                    ->pluck('name', 'user_id')
                                             ),
 
                                         Forms\Components\Select::make('role') // Remove pivot. prefix
@@ -332,7 +339,7 @@ class TournamentResource extends Resource
                     ->orWhereHas(
                         'moderators',
                         fn($q) =>
-                        $q->where('user_id', auth()->id())
+                        $q->where('tournament_moderators.user_id', auth()->id())
                     )
             )
             ->columns([

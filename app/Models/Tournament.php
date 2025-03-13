@@ -60,8 +60,14 @@ class Tournament extends Model
         'registration_end_date' => 'date',
     ];
 
+    // public function moderators()
+    // {
+    //     return $this->hasMany(TournamentModerator::class);
+    // }
+
     public function moderators()
     {
-        return $this->hasMany(TournamentModerator::class);
+        return $this->belongsToMany(User::class, 'tournament_moderators')
+            ->withPivot('role');
     }
 }
