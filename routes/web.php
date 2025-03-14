@@ -15,14 +15,15 @@ Route::get('/', function () {
         if($user->hasRole(['players'])) {
             return redirect(route('filament.players.auth.login'));
         }
-        if($user->hasRole(['admin'])) {
+        if($user->hasRole(['super_admin'])) {
             return redirect(route('filament.admin.auth.login'));
         }
         if($user->hasRole(['organizers'])) {
             return redirect(route('filament.organizers.auth.login'));
         }
+    } else {
+        return view('welcome', compact('pageTitle', 'pageDescription'));
     }
-    return view('welcome', compact('pageTitle', 'pageDescription'));
 })->name('home');
 
 Route::get('/invitation/{team}/{action}', HandleInvitationAction::class)
