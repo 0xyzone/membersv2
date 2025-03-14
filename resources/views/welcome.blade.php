@@ -109,29 +109,30 @@
 
     </style>
 </head>
-<body class="bg-stone-950 text-stone-100 font-sans">
+<body class="bg-stone-950 text-stone-100 font-sans relative">
 
     <!-- Top Navigation -->
-    <nav class="arena-gradient px-6 py-4 border-b-2 border-purple-500/30">
+    <nav class="arena-gradient px-6 py-4 border-b-2 border-purple-500/30 sticky top-0 z-[999]">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-4">
-                <i class="fas fa-gamepad text-purple-400 text-2xl"></i>
-                <div>
+                <img src="{{ asset('favicon.png') }}" alt="Vidanta Portal Logo" class="w-16">
+                <div class="hidden lg:flex flex-col">
                     <h1 class="text-xl font-bold">Vidanta Portal</h1>
                     <p class="text-sm text-stone-400">By Vidanta Champions Arena</p>
                 </div>
             </div>
             <div class="hidden md:flex items-center space-x-6">
-                <a href="{{ route('filament.players.auth.login') }}" class="button-hover text-sm text-purple-300 bg-purple-800 py-4 px-6 rounded-lg transition-all">
-                    <i class="fas fa-users mr-1"></i>Login Players
+                <a href="{{ route('filament.players.auth.login') }}" class="button-hover text-sm text-purple-100 bg-purple-800 py-4 px-6 rounded-lg transition-all">
+                    <i class="fas fa-users mr-1"></i>Login as Players
                 </a>
-                <a href="{{ route('filament.organizers.auth.login') }}" class="button-hover text-sm text-blue-300 bg-blue-800 py-4 px-6 rounded-lg transition-all">
-                    <i class="fas fa-trophy mr-1"></i>Login Organizers
+                <a href="{{ route('filament.organizers.auth.login') }}" class="button-hover text-sm text-blue-100 bg-blue-800 py-4 px-6 rounded-lg transition-all">
+                    <i class="fas fa-trophy mr-1"></i>Login as Organizers
                 </a>
             </div>
             <div class="flex md:hidden items-center">
-                <button id="dropdownButton" class="text-sm text-purple-300 focus:outline-none">
-                    <i class="fas fa-bars"></i>
+                <button id="dropdownButton" class="text-sm text-purple-300 focus:outline-none flex gap-2 items-center">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Login</span>
                 </button>
             </div>
         </div>
@@ -139,10 +140,10 @@
         <!-- Dropdown Menu -->
         <div id="dropdownMenu" class="hidden md:hidden bg-gray-800 rounded-lg mt-2 overflow-hidden transition-all duration-300">
             <a href="{{ route('filament.players.auth.login') }}" class="block text-sm text-purple-300 py-2 px-4 hover:bg-purple-700">
-                <i class="fas fa-users mr-1"></i>Login Players
+                <i class="fas fa-users mr-1"></i>Login as Players
             </a>
             <a href="{{ route('filament.organizers.auth.login') }}" class="block text-sm text-blue-300 py-2 px-4 hover:bg-blue-700">
-                <i class="fas fa-trophy mr-1"></i>Login Organizers
+                <i class="fas fa-trophy mr-1"></i>Login as Organizers
             </a>
         </div>
     </nav>
@@ -283,11 +284,11 @@
                     Join 250,000+ registered competitors and 15,000+ tournaments in the world's
                     fastest-growing esports platform
                 </p>
-                <div class="flex justify-center gap-6">
-                    <a href="{{ route('filament.players.auth.register') }}" class="bg-purple-600 hover:bg-purple-500 px-8 py-4 rounded-lg font-bold transition-all">
+                <div class="flex justify-center gap-6 px-6 text-xs lg:text-lg">
+                    <a href="{{ route('filament.players.auth.register') }}" class="bg-purple-600 hover:bg-purple-500 px-8 py-4 rounded-lg font-bold transition-all flex-nowrap text-nowrap">
                         Start Competing
                     </a>
-                    <a href="{{ route('filament.organizers.auth.register') }}" class="bg-blue-600 hover:bg-blue-500 px-8 py-4 rounded-lg font-bold transition-all">
+                    <a href="{{ route('filament.organizers.auth.register') }}" class="bg-blue-600 hover:bg-blue-500 px-8 py-4 rounded-lg font-bold transition-all flex-nowrap text-nowrap">
                         Create Tournament
                     </a>
                 </div>
@@ -300,7 +301,7 @@
         <div class="container mx-auto px-4 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="flex items-center space-x-4 mb-4 md:mb-0">
-                    <i class="fas fa-gamepad text-purple-400 text-2xl"></i>
+                    <img src="{{ asset('favicon.png') }}" alt="Vidanta Portal Logo" class="w-16">
                     <div>
                         <h3 class="font-bold">Vidanta Portal</h3>
                         <p class="text-sm text-stone-400">Powered by Vidanta Champions Arena</p>
