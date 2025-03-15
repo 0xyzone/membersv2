@@ -13,13 +13,13 @@ Route::get('/', function () {
     $user = auth()->user();
     if($user) {
         if($user->hasRole(['players'])) {
-            return redirect(route('filament.players.auth.login'));
+            return redirect(route('filament.players.pages.dashboard'));
         }
         if($user->hasRole(['super_admin'])) {
-            return redirect(route('filament.admin.auth.login'));
+            return redirect(route('filament.admin.pages.dashboard'));
         }
         if($user->hasRole(['organizers'])) {
-            return redirect(route('filament.organizers.auth.login'));
+            return redirect(route('filament.organizers.pages.dashboard'));
         }
     } else {
         return view('welcome', compact('pageTitle', 'pageDescription'));
