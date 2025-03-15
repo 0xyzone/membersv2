@@ -398,6 +398,8 @@ class UserResource extends Resource
                         ->icon('heroicon-o-trophy')
                         ->action(function ($record) {
                             $record->assignRole('organizers');
+                            $record->removeRole('players');
+                            $record->removeRole('super_admin');
                             Notification::make()
                                 ->title('User updated to organizer.')
                                 ->send()
@@ -409,6 +411,8 @@ class UserResource extends Resource
                         ->icon('heroicon-o-user')
                         ->action(function ($record) {
                             $record->assignRole('players');
+                            $record->removeRole('organizers');
+                            $record->removeRole('super_admin');
                             Notification::make()
                                 ->title('User updated to player.')
                                 ->send()
@@ -420,6 +424,8 @@ class UserResource extends Resource
                         ->icon('heroicon-o-shield-exclamation')
                         ->action(function ($record) {
                             $record->assignRole('super_admin');
+                            $record->removeRole('players');
+                            $record->removeRole('organizers');
                             Notification::make()
                                 ->title('User updated to admin.')
                                 ->send()
