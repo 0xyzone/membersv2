@@ -85,7 +85,7 @@ class ModeratorResource extends Resource
                 Tables\Columns\TextColumn::make('moderator.email')
                     ->label('Email')
                     ->sortable(),
-                Tables\Columns\ToggleColumn::make('is_active'),
+                // Tables\Columns\ToggleColumn::make('is_active'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
