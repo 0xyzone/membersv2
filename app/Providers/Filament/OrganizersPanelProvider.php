@@ -36,6 +36,7 @@ class OrganizersPanelProvider extends PanelProvider
         return $panel
             ->id('organizers')
             ->path('organizers')
+            // ->unsavedChangesAlerts()
             ->login()
             ->registration()
             ->passwordReset()

@@ -33,6 +33,7 @@ class PlayersPanelProvider extends PanelProvider
         return $panel
             ->id('players')
             ->path('players')
+            // ->unsavedChangesAlerts()
             ->login()
             ->registration()
             ->passwordReset()
