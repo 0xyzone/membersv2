@@ -90,7 +90,12 @@ class TeamsYouAreInResource extends Resource
                                     ])->columnSpan(['md' => 1]),
                             ]),
                     ])
-                    ->collapsible(),
+                    ->collapsible()
+                    ->extraAlpineAttributes([
+                        'x-transition:enter' => 'transition-all duration-300 ease-out',
+                        'x-transition:enter-start' => 'opacity-0',
+                        'x-transition:enter-end' => 'opacity-100',
+                    ]),
 
                 Section::make('Team Leadership')
                     ->schema([

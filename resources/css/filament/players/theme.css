@@ -1,3 +1,26 @@
 @import '/vendor/filament/filament/resources/css/theme.css';
 
 @config 'tailwind.config.js';
+
+.fi-section-content-ctn {
+    transition: all 0.3s ease-in-out;
+    display: grid !important;
+    grid-template-rows: 1fr;
+    overflow: hidden;
+}
+
+.fi-section-content-ctn[aria-expanded="false"] {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: all 0.2s ease-in; /* Faster transition for collapse */
+}
+
+.fi-section-content-ctn > * {
+    min-height: 0; /* Crucial for grid transitions */
+    transition: inherit;
+}
+
+/* Add this for the chevron icon */
+.fi-icon-btn-icon {
+    transition: transform 0.3s ease-in-out;
+}
