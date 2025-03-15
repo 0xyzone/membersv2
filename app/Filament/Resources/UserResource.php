@@ -18,7 +18,9 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Notifications\Notification;
 use Filament\Support\Enums\IconPosition;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\Layout\Grid;
@@ -33,6 +35,7 @@ use Filament\Infolists\Components\ImageEntry;
 use App\Filament\Resources\UserResource\Pages;
 use Filament\Infolists\Components\Actions\Action;
 use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Tables\Actions\Action as TableAction;
 use Filament\Infolists\Components\Grid as InfoGrid;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Infolists\Components\Split as IngoSplit;
@@ -104,10 +107,10 @@ class UserResource extends Resource
                     ->columns(4)
                     ->schema([
                         TextEntry::make('id')
-                        ->label('User Id')
-                        ->copyable()
-                        ->copyMessage('Copied!')
-                        ->copyMessageDuration('3000'),
+                            ->label('User Id')
+                            ->copyable()
+                            ->copyMessage('Copied!')
+                            ->copyMessageDuration('3000'),
                         TextEntry::make('gender'),
                         TextEntry::make('created_at')
                             ->dateTime('M d, Y h:i A'),
@@ -390,6 +393,41 @@ class UserResource extends Resource
                 DeleteAction::make()
                     ->icon('heroicon-o-trash')
                     ->color('danger'),
+                ActionGroup::make([
+                    TableAction::make('make_organier')
+                        ->icon('heroicon-o-trophy')
+                        ->action(function ($record) {
+                            $record->assignRole('organizers');
+                            Notification::make()
+                                ->title('User updated to organizer.')
+                                ->send()
+                                ->success();
+                        })
+                        ->requiresConfirmation()
+                        ->visible(fn($record) => !$record->hasRole('organizers')),
+                    TableAction::make('make_player')
+                        ->icon('heroicon-o-user')
+                        ->action(function ($record) {
+                            $record->assignRole('players');
+                            Notification::make()
+                                ->title('User updated to player.')
+                                ->send()
+                                ->success();
+                        })
+                        ->requiresConfirmation()
+                        ->visible(fn($record) => !$record->hasRole('players')),
+                    TableAction::make('make_admin')
+                        ->icon('heroicon-o-shield-exclamation')
+                        ->action(function ($record) {
+                            $record->assignRole('super_admin');
+                            Notification::make()
+                                ->title('User updated to admin.')
+                                ->send()
+                                ->success();
+                        })
+                        ->requiresConfirmation()
+                        ->visible(fn($record) => !$record->hasRole('super_admin'))
+                ])
             ])
             ->recordAction('view')
             ->bulkActions([
