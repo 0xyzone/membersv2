@@ -285,7 +285,7 @@ class TournamentResource extends Resource
                                     ]),
                             ]),
                         Forms\Components\Tabs\Tab::make('Moderators')
-                            ->visible(fn($record): bool => $record->user_id === auth()->user()->id)
+                            ->hiddenOn('create')
                             ->icon('heroicon-o-shield-check')
                             ->schema([
                                 Forms\Components\Repeater::make('moderators')
