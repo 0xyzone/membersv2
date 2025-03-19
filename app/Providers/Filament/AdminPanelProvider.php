@@ -112,7 +112,13 @@ class AdminPanelProvider extends PanelProvider
                         rules: [Password::default()->mixedCase()->uncompromised(3)], // you may pass an array of validation rules as well. (default = ['min:8'])
                         requiresCurrentPassword: true, // when false, the user can update their password without entering their current password. (default = true)
                     )
-                    ->avatarUploadComponent(fn() => FileUpload::make('avatar_url')->image()->label('Profile Photo')->directory('images/profile-photos'))
+                    ->avatarUploadComponent(fn() => FileUpload::make('avatar_url')->image()->label('Profile Photo')->directory('images/profile-photos')),
+                TableLayoutTogglePlugin::make()
+                    ->shareLayoutBetweenPages(false) // allow all tables to share the layout option (requires persistLayoutInLocalStorage to be true)
+                    ->displayToggleAction() // used to display the toggle action button automatically
+                    ->toggleActionHook('tables::toolbar.search.after') // chose the Filament view hook to render the button on
+                    ->listLayoutButtonIcon('heroicon-o-list-bullet')
+                    ->gridLayoutButtonIcon('heroicon-o-squares-2x2'),
             ]);
     }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a28292fc286892d27301c576d116f3f7",
+    "content-hash": "9aeb4ed5dfd3cffe8158b936c06ef8ed",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2212,21 +2212,21 @@
         },
         {
             "name": "hydrat/filament-table-layout-toggle",
-            "version": "v2.0.1",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Hydrat-Agency/filament-table-layout-toggle.git",
-                "reference": "338763371fc2b71bf0934b766ef69b055bcb3f73"
+                "reference": "3d23bc32526fe7b880ba5b862733e19995dedc2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Hydrat-Agency/filament-table-layout-toggle/zipball/338763371fc2b71bf0934b766ef69b055bcb3f73",
-                "reference": "338763371fc2b71bf0934b766ef69b055bcb3f73",
+                "url": "https://api.github.com/repos/Hydrat-Agency/filament-table-layout-toggle/zipball/3d23bc32526fe7b880ba5b862733e19995dedc2a",
+                "reference": "3d23bc32526fe7b880ba5b862733e19995dedc2a",
                 "shasum": ""
             },
             "require": {
                 "filament/filament": "^3.0",
-                "illuminate/contracts": "^10.0|^11.0",
+                "illuminate/contracts": "^10.0|^11.0|^12.0",
                 "php": "^8.1",
                 "spatie/laravel-package-tools": "^1.15.0"
             },
@@ -2287,7 +2287,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-10-14T18:07:44+00:00"
+            "time": "2025-03-11T11:26:05+00:00"
         },
         {
             "name": "jeffgreco13/filament-breezy",

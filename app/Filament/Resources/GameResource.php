@@ -64,10 +64,17 @@ class GameResource extends Resource
             ]);
     }
 
+    // public static function getListTableColumns(): array;
+    // public static function getGridTableColumns(): array;
+
     public static function table(Table $table): Table
     {
+        $livewire = $table->getLivewire();
         return $table
             ->columns([
+                // $livewire->isGridLayout()
+                // ? static::getGridTableColumns()
+                // : static::getListTableColumns(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\ImageColumn::make('image_path'),
@@ -83,6 +90,15 @@ class GameResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->contentGrid(
+                fn() => $livewire->isListLayout()
+                ? null
+                : [
+                    'md' => 2,
+                    'lg' => 3,
+                    'xl' => 4,
+                ]
+            )
             ->filters([
                 //
             ])
