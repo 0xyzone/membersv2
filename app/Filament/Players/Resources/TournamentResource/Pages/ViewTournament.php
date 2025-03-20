@@ -2,9 +2,11 @@
 
 namespace App\Filament\Players\Resources\TournamentResource\Pages;
 
+use App\Models\User;
 use App\Models\UserTeam;
 use Filament\Actions\Action;
 use App\Models\TournamentRegistration;
+use Filament\Forms\Components\Repeater;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Validation\ValidationException;
@@ -15,6 +17,7 @@ use App\Notifications\TournamentPlayersRegistrationNotification;
 class ViewTournament extends ViewRecord
 {
     protected static string $resource = TournamentResource::class;
+
     public function getHeading(): string
     {
         return __($this->record->name);
@@ -53,41 +56,53 @@ class ViewTournament extends ViewRecord
                         ->hidden(fn() => !$this->userHasEligibleTeams())
                         ->live()
                         ->afterStateUpdated(function ($state, \Filament\Forms\Set $set) {
-                            $set('selected_members', []);
+                            $set('players', []);
                         }),
 
-                    \Filament\Forms\Components\CheckboxList::make('selected_members')
-                        ->label('Select Participating Players')
-                        ->options(function (\Filament\Forms\Get $get) {
-                            $team = UserTeam::find($get('team_id'));
-                            // Get owner details
-                            $owner = [
-                                $team->owner->id => $team->owner->name . ' (Owner)'
-                            ];
+                    Repeater::make('players')
+                        ->label('Players Information')
+                        ->defaultItems(fn() => $this->record->min_team_players)
+                        ->schema([
+                            \Filament\Forms\Components\Select::make('user_id')
+                                ->label('Player')
+                                ->required()
+                                ->searchable()
+                                ->options(function (\Filament\Forms\Get $get) {
+                                    $team = UserTeam::find($get('../../team_id'));
+                                    $currentUserId = $get('user_id');
 
-                            // Get team members with player role
-                            $players = $team->members()
-                                ->wherePivot('role', 'player')
-                                ->pluck('name', 'user_team_members.user_id')
-                                ->toArray();
+                                    // Get all selected user IDs except current one
+                                    $selectedUserIds = collect($get('../../players'))
+                                        ->pluck('user_id')
+                                        ->filter(fn($id) => $id !== $currentUserId)
+                                        ->toArray();
 
-                            // Combine owner and players, ensuring owner is first
-                            return $owner + $players;
-                        })
-                        ->required()
-                        ->rule(function (\Filament\Forms\Get $get) {
-                            $tournament = $this->getRecord();
-                            return [
-                                'array',
-                                'min:' . $tournament->min_team_players,
-                                'max:' . $tournament->max_team_players,
-                            ];
-                        })
-                        ->hidden(fn(\Filament\Forms\Get $get) => !$get('team_id'))
-                        ->validationMessages([
-                            'min' => 'Minimum :min players required',
-                            'max' => 'Maximum :max players allowed',
+                                    return $team->members()
+                                        ->where(function ($query) use ($team) {
+                                            $query->where('user_team_members.user_id', $team->owner_id)
+                                                ->orWhere('user_team_members.role', 'player');
+                                        })
+                                        ->whereNotIn('user_team_members.user_id', $selectedUserIds)
+                                        ->pluck('name', 'user_team_members.user_id')
+                                        ->toArray();
+                                })
+                                ->reactive()
+                                ->live(),
+
+                            \Filament\Forms\Components\Group::make()
+                                ->statePath('custom_fields')
+                                ->schema(fn() => $this->getCustomFieldsComponents())
+                                ->columns(2)
                         ])
+                        ->minItems(fn() => $this->record->min_team_players)
+                        ->maxItems(fn() => $this->record->max_team_players)
+                        ->hidden(fn(\Filament\Forms\Get $get) => !$get('team_id'))
+                        ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
+                            return $data;
+                        })
+                        ->mutateRelationshipDataBeforeFillUsing(function (array $data): array {
+                            return $data;
+                        })
                 ])
                 ->action(function (array $data) {
                     $tournament = $this->getRecord();
@@ -101,14 +116,15 @@ class ViewTournament extends ViewRecord
                     }
 
                     // Validate team members
+                    $selectedUserIds = collect($data['players'])->pluck('user_id');
                     $invalidMembers = $team->members()
-                        ->whereIn('user_team_members.user_id', $data['selected_members'])
+                        ->whereIn('user_team_members.user_id', $selectedUserIds)
                         ->whereDoesntHave('userGameInfos', fn($q) => $q->where('game_id', $tournament->game_id))
                         ->pluck('name');
 
                     if ($invalidMembers->isNotEmpty()) {
                         throw ValidationException::withMessages([
-                            'selected_members' => "Missing game info for: " . $invalidMembers->join(', ')
+                            'players' => "Missing game info for: " . $invalidMembers->join(', ')
                         ]);
                     }
 
@@ -126,12 +142,16 @@ class ViewTournament extends ViewRecord
                         'status' => 'pending',
                     ]);
 
-                    // Attach selected players
+                    // Attach players with custom fields
                     $registration->players()->attach(
-                        collect($data['selected_members'])
-                            ->mapWithKeys(fn($userId) => [
-                                $userId => ['user_team_id' => $team->id]
-                            ])
+                        collect($data['players'])->mapWithKeys(function ($player) use ($team) {
+                        return [
+                            $player['user_id'] => [
+                                'user_team_id' => $team->id,
+                                'custom_fields' => $player['custom_fields'] ?? []
+                            ]
+                        ];
+                    })
                     );
 
                     // Send notifications
@@ -143,16 +163,10 @@ class ViewTournament extends ViewRecord
 
                     // Notify organizer and players
                     $tournament->user->notify(new TournamentRegistrationNotification($registration));
-                    // - Team owner (new)
-                    $team->owner->notify(
-                        new TournamentPlayersRegistrationNotification($registration)
-                    );
+                    $team->owner->notify(new TournamentPlayersRegistrationNotification($registration));
 
-                    // - Selected players (existing, but ensure proper delivery)
                     $registration->players->each(function ($player) use ($registration) {
-                        $player->notify(
-                            new TournamentPlayersRegistrationNotification($registration)
-                        );
+                        $player->notify(new TournamentPlayersRegistrationNotification($registration));
                     });
                 })
                 ->visible(function () {
@@ -177,6 +191,31 @@ class ViewTournament extends ViewRecord
                     return null;
                 })
         ];
+    }
+
+    protected function getCustomFieldsComponents(): array
+    {
+        return $this->record->customFields->map(function ($field) {
+            $component = match ($field->type) {
+                'text' => \Filament\Forms\Components\TextInput::make($field->id)
+                    ->label($field->name)
+                    ->required($field->is_required),
+
+                'number' => \Filament\Forms\Components\TextInput::make($field->id)
+                    ->numeric()
+                    ->label($field->name)
+                    ->required($field->is_required),
+
+                'dropdown' => \Filament\Forms\Components\Select::make($field->id)
+                    ->label($field->name)
+                    ->options(explode(',', $field->options))
+                    ->required($field->is_required),
+
+                default => null,
+            };
+
+            return $component->columnSpan(1);
+        })->filter()->toArray();
     }
 
     protected function userHasEligibleTeams(): bool

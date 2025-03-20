@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->foreignId('registration_id')->constrained('tournament_registrations')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_team_id')->constrained()->cascadeOnDelete();
-            // $table->enum('role', ['player', 'substitute'])->default('player');
             $table->timestamps();
 
             $table->unique(['registration_id', 'user_id']);

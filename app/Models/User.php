@@ -30,6 +30,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles, HasPanelShield;
 
+    protected $primaryKey = 'id';
+
     // Filament Setup
     public function getFilamentAvatarUrl(): ?string
     {

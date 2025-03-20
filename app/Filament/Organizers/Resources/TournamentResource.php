@@ -284,6 +284,37 @@ class TournamentResource extends Resource
                                             ->maxLength(255),
                                     ]),
                             ]),
+                        Forms\Components\Tabs\Tab::make('Registration Fields')
+                            ->icon('heroicon-o-document-text')
+                            ->schema([
+                                Forms\Components\Repeater::make('customFields')
+                                    ->relationship()
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+                                            ->required()
+                                            ->columnSpan(2),
+
+                                        Forms\Components\Select::make('type')
+                                            ->options([
+                                                'text' => 'Text',
+                                                'number' => 'Number',
+                                                'dropdown' => 'Dropdown',
+                                            ])
+                                            ->reactive()
+                                            ->required(),
+
+                                        Forms\Components\Textarea::make('options')
+                                            ->helperText('For dropdowns - comma separated values')
+                                            ->visible(fn(Get $get) => $get('type') === 'dropdown')
+                                            ->required(fn(Get $get) => $get('type') === 'dropdown'),
+
+                                        Forms\Components\Toggle::make('is_required')
+                                            ->inline()
+                                            ->default(true),
+                                    ])
+                                    ->columns(2)
+                                    ->itemLabel(fn(array $state): ?string => $state['name'] ?? null)
+                            ]),
                         Forms\Components\Tabs\Tab::make('Moderators')
                             ->hiddenOn('create')
                             ->icon('heroicon-o-shield-check')

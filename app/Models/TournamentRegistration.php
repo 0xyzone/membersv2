@@ -10,11 +10,11 @@ class TournamentRegistration extends Model
 {
     public function players()
     {
-        return $this->belongsToMany(User::class, 'tournament_registration_players',
-        'registration_id', // Correct foreign key for the registration
-        'user_id')
-        ->with('userGameInfos')
-        ->withTimestamps();
+        return $this->belongsToMany(User::class, 'tournament_registration_players')
+            ->using(TournamentRegistrationPlayer::class) // Crucial for casting
+            ->withPivot(['custom_fields'])
+            ->withPivot(['tournament_registration_id', 'user_id'])
+            ->withTimestamps();
     }
 
     public function team()

@@ -4,8 +4,10 @@ namespace App\Models;
 
 use App\Models\User;
 use App\Models\UserTeam;
+use App\Models\TournamentCustomField;
 use App\Models\TournamentRegistration;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tournament extends Model
@@ -68,5 +70,10 @@ class Tournament extends Model
     public function moderators()
     {
         return $this->hasMany(TournamentModerator::class);
+    }
+
+    public function customFields(): HasMany
+    {
+        return $this->hasMany(TournamentCustomField::class);
     }
 }

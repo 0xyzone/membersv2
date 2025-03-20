@@ -50,17 +50,17 @@ class TournamentRegistrationResource extends Resource
                 ->exists();
     }
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('team_id')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('status')
-                    ->required(),
-            ]);
-    }
+    // public static function form(Form $form): Form
+    // {
+    //     return $form
+    //         ->schema([
+    //             Forms\Components\TextInput::make('team_id')
+    //                 ->required()
+    //                 ->numeric(),
+    //             Forms\Components\TextInput::make('status')
+    //                 ->required(),
+    //         ]);
+    // }
 
     public static function infolist(Infolist $infolist): Infolist
     {
@@ -122,7 +122,7 @@ class TournamentRegistrationResource extends Resource
                     ->schema([
                         RepeatableEntry::make('players')
                             ->schema([
-                                Grid::make(7)
+                                Grid::make(8)
                                     ->schema([
                                         ImageEntry::make('avatar_url')
                                             ->simpleLightbox()
@@ -151,6 +151,7 @@ class TournamentRegistrationResource extends Resource
                                             ->color('primary')
                                             ->default('N/a')
                                             ->columnSpan(2),
+
                                         Actions::make([
                                             Action::make('view')
                                                 ->label('View Details')
@@ -162,12 +163,40 @@ class TournamentRegistrationResource extends Resource
                                                     'user' => $record,
                                                     'model' => $model
                                                 ]))
-                                                ->modalWidth('3xl') // Adjust the modal width as needed,
+                                                ->modalWidth('3xl')
                                                 ->modalSubmitAction(false)
                                                 ->modalCancelAction(false)
                                         ])
                                             ->alignCenter()
+                                            ->columnSpan(1)
                                             ->extraAttributes(['class' => 'flex items-center justify-center h-full']),
+
+                                        // Custom Fields Section
+                                        Section::make('Custom Fields')
+                                            ->heading('Additional Information')
+                                            ->schema([
+                                                TextEntry::make('pivot.custom_fields')
+                                                    ->label('')
+                                                    ->formatStateUsing(function (Model $player) {
+                                                        $customFields = $player->pivot->custom_fields ?? [];
+                                                        // dd($player->pivot->custom_fields);
+                                                        $fieldDefinitions = static::getCustomFieldDefinitions($player->pivot->registration_id);
+
+                                                        return collect($customFields)->map(function ($value, $fieldId) use ($fieldDefinitions) {
+                                                            // Convert field ID to integer
+                                                            $fieldId = (int) $fieldId;
+                                                            $field = $fieldDefinitions->get($fieldId);
+
+                                                            return $field
+                                                                ? "<p> <span class='text-amber-500 capitalize'><strong>{$field['name']}:</strong></span> {$value}</p>"
+                                                                : "<strong>Unknown Field (#{$fieldId}):</strong> {$value}";
+                                                        })->implode('<br>');
+                                                    })
+                                                    ->html()
+                                                    ->columnSpanFull()
+                                            ])
+                                            ->collapsible()
+                                            ->columnSpanFull(),
                                     ])
                             ])
                             ->columns(1)
@@ -195,6 +224,28 @@ class TournamentRegistrationResource extends Resource
                     ])
                     ->collapsible(),
             ]);
+    }
+
+    protected static function getCustomFieldLabels(int $registrationId): array
+    {
+        $registration = TournamentRegistration::with('tournament.customFields')->find($registrationId);
+
+        return $registration->tournament->customFields
+            ->pluck('name', 'id')
+            ->toArray();
+    }
+
+    protected static function getCustomFieldDefinitions(int $registrationId)
+    {
+        $registration = TournamentRegistration::with('tournament.customFields')->findOrFail($registrationId);
+
+        return $registration->tournament->customFields->mapWithKeys(fn($field) => [
+            $field->id => [
+                'name' => $field->name,
+                'type' => $field->type,
+                'options' => $field->options ? explode(',', $field->options) : null
+            ]
+        ]);
     }
 
     public static function table(Table $table): Table
