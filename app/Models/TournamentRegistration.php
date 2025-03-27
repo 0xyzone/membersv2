@@ -12,8 +12,8 @@ class TournamentRegistration extends Model
     {
         return $this->belongsToMany(User::class, 'tournament_registration_players')
             ->using(TournamentRegistrationPlayer::class) // Crucial for casting
-            ->withPivot(['custom_fields'])
-            ->withPivot(['tournament_registration_id', 'user_id'])
+            ->withPivot(['custom_fields', 'tournament_registration_id', 'user_id'])
+            // ->withPivot(['tournament_registration_id', 'user_id'])
             ->withTimestamps();
     }
 

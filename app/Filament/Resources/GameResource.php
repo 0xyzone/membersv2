@@ -124,7 +124,7 @@ class GameResource extends Resource
         return [
             'index' => Pages\ListGames::route('/'),
             'create' => Pages\CreateGame::route('/create'),
-            'edit' => Pages\EditGame::route('/{record}/edit'),
+            // 'edit' => Pages\EditGame::route('/{record}/edit'),
         ];
     }
 }

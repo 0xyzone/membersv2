@@ -19,16 +19,25 @@ class EditTournamentRegistration extends EditRecord
         ];
     }
 
-    protected function afterSave(): void
+    protected function beforeSave(): void
     {
-        // This will automatically manage timestamps
-        $this->record->players()->sync(
-            collect($this->data['players'])->mapWithKeys(fn($userId) => [
-                $userId => [
+        $playersData = collect($this->data['players'])->mapWithKeys(function ($player) {
+            return [
+                $player['user_id'] => [
                     'user_team_id' => $this->record->team_id,
-                    // created_at and updated_at added automatically
+                    'custom_fields' => $player['custom_fields'] ?? []
                 ]
-            ])
-        );
+            ];
+        });
+
+        $test = $this->record->players()->sync($playersData->toArray());
+    }
+
+    protected function onValidationError(ValidationException $exception): void
+    {
+        Notification::make()
+            ->title($exception->getMessage())
+            ->danger()
+            ->send();
     }
 }

@@ -93,8 +93,10 @@ class TournamentRegistrationResource extends Resource
                     ->hint(fn($record) => 'Minimum: ' . $record->tournament->min_team_players . ', Max: ' . $record->tournament->max_team_players . ' players')
                     ->label('Participating Players')
                     ->relationship('players')
+                    ->saveRelationshipsUsing(null)
                     ->schema([
                         \Filament\Forms\Components\Select::make('user_id')
+                            ->dehydrated(false)
                             ->label('Player')
                             ->required()
                             ->searchable()
@@ -121,29 +123,33 @@ class TournamentRegistrationResource extends Resource
 
                         \Filament\Forms\Components\Group::make()
                             // ->statePath('pivot.custom_fields')
-                            ->statePath('pivot.custom_fields')
+                            // ->statePath('pivot.custom_fields')
                             ->schema(function (Get $get) {
                                 $tournamentId = $get('../../tournament_id');
                                 $tournament = Tournament::with('customFields')->find($tournamentId);
 
                                 // dd($tournament);
-                                if (!$tournament)
+                                if (!$tournament) {
                                     return [];
+                                }
 
                                 return $tournament->customFields->map(function ($field) {
 
                                     // dd($field);
                                     $component = match ($field->type) {
-                                        'text' => \Filament\Forms\Components\TextInput::make("{$field->id}")
+                                        'text' => \Filament\Forms\Components\TextInput::make("custom_fields.{$field->id}")
+                                            ->dehydrated(false)
                                             ->label($field->name)
                                             ->required($field->is_required),
 
-                                        'number' => \Filament\Forms\Components\TextInput::make("{$field->id}")
+                                        'number' => \Filament\Forms\Components\TextInput::make("custom_fields.{$field->id}")
+                                            ->dehydrated(false)
                                             ->numeric()
                                             ->label($field->name)
                                             ->required($field->is_required),
 
-                                        'dropdown' => \Filament\Forms\Components\Select::make("{$field->id}")
+                                        'dropdown' => \Filament\Forms\Components\Select::make("custom_fields.{$field->id}")
+                                            ->dehydrated(false)
                                             ->label($field->name)
                                             ->options(explode(',', $field->options))
                                             ->required($field->is_required),
@@ -167,16 +173,8 @@ class TournamentRegistrationResource extends Resource
                     ->mutateRelationshipDataBeforeFillUsing(function (array $data): array {
                         // dd($data);
                         return [
-                            'user_id' => $data['user_id'],
-                            'custom_fields' => json_decode($data['pivot']['custom_fields'] ?? '{}', true),
-                        ];
-                    })
-                    ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
-                        return [
-                            'user_id' => $data['user_id'],
-                            'pivot' => [
-                                'custom_fields' => json_encode($data['custom_fields'] ?? []), // Ensure pivot fields are encoded properly
-                            ]
+                            'user_id' => $data['id'],
+                            'custom_fields' => json_decode($data['custom_fields'] ?? '{}', true),
                         ];
                     })
                     ->addActionLabel('Add Player'),

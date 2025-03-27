@@ -77,9 +77,14 @@ class ViewTournament extends ViewRecord
                                         ->filter(fn($id) => $id !== $currentUserId)
                                         ->toArray();
 
+                                        // $authUser = auth()->user();
+
+                                        $ownerId = $team->owner->id;
+                                        // dd($ownerId);
+
                                     return $team->members()
-                                        ->where(function ($query) use ($team) {
-                                            $query->where('user_team_members.user_id', $team->owner_id)
+                                        ->where(function ($query) use ($team, $ownerId) {
+                                            $query->where('user_team_members.user_id', $ownerId)
                                                 ->orWhere('user_team_members.role', 'player');
                                         })
                                         ->whereNotIn('user_team_members.user_id', $selectedUserIds)

@@ -17,6 +17,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
+use App\Models\TournamentRegistrationPlayer;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
@@ -171,7 +172,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
     public function tournamentRegistrations()
     {
-        return $this->belongsToMany(TournamentRegistration::class, 'tournament_registration_players');
+        return $this->belongsToMany(TournamentRegistration::class, 'tournament_registration_players',)
+        ->using(TournamentRegistrationPlayer::class)
+        ->withPivot('custom_fields');
     }
 
     public function moderatedTournaments()

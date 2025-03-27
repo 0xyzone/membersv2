@@ -180,7 +180,7 @@ class TournamentRegistrationResource extends Resource
                                                     ->formatStateUsing(function (Model $player) {
                                                         $customFields = $player->pivot->custom_fields ?? [];
                                                         // dd($player->pivot->custom_fields);
-                                                        $fieldDefinitions = static::getCustomFieldDefinitions($player->pivot->registration_id);
+                                                        $fieldDefinitions = static::getCustomFieldDefinitions($player->pivot->tournament_registration_id);
 
                                                         return collect($customFields)->map(function ($value, $fieldId) use ($fieldDefinitions) {
                                                             // Convert field ID to integer
