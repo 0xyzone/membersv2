@@ -179,17 +179,24 @@ class TournamentRegistrationResource extends Resource
                                                     ->label('')
                                                     ->formatStateUsing(function (Model $player) {
                                                         $customFields = $player->pivot->custom_fields ?? [];
-                                                        // dd($player->pivot->custom_fields);
                                                         $fieldDefinitions = static::getCustomFieldDefinitions($player->pivot->tournament_registration_id);
 
                                                         return collect($customFields)->map(function ($value, $fieldId) use ($fieldDefinitions) {
-                                                            // Convert field ID to integer
                                                             $fieldId = (int) $fieldId;
                                                             $field = $fieldDefinitions->get($fieldId);
 
-                                                            return $field
-                                                                ? "<p> <span class='text-amber-500 capitalize'><strong>{$field['name']}:</strong></span> {$value}</p>"
-                                                                : "<strong>Unknown Field (#{$fieldId}):</strong> {$value}";
+                                                            if (!$field) {
+                                                                return "<strong>Unknown Field (#{$fieldId}):</strong> {$value}";
+                                                            }
+
+                                                            // Handle dropdown fields
+                                                            if ($field['type'] === 'dropdown' && isset($field['options'][$value])) {
+                                                                $displayValue = $field['options'][$value];
+                                                            } else {
+                                                                $displayValue = $value;
+                                                            }
+
+                                                            return "<p> <span class='text-amber-500 capitalize'><strong>{$field['name']}:</strong></span> {$displayValue}</p>";
                                                         })->implode('<br>');
                                                     })
                                                     ->html()
@@ -243,7 +250,10 @@ class TournamentRegistrationResource extends Resource
             $field->id => [
                 'name' => $field->name,
                 'type' => $field->type,
-                'options' => $field->options ? explode(',', $field->options) : null
+                'options' => $field->options ? array_combine(
+                    range(0, count(explode(',', $field->options)) - 1),
+                    explode(',', $field->options)
+                ) : null
             ]
         ]);
     }

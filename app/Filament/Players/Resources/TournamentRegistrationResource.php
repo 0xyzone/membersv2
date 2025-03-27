@@ -10,6 +10,7 @@ use App\Models\UserTeam;
 use Filament\Forms\Form;
 use App\Models\Tournament;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\View;
@@ -122,8 +123,6 @@ class TournamentRegistrationResource extends Resource
                             ->live(),
 
                         \Filament\Forms\Components\Group::make()
-                            // ->statePath('pivot.custom_fields')
-                            // ->statePath('pivot.custom_fields')
                             ->schema(function (Get $get) {
                                 $tournamentId = $get('../../tournament_id');
                                 $tournament = Tournament::with('customFields')->find($tournamentId);
@@ -245,7 +244,7 @@ class TournamentRegistrationResource extends Resource
                     ->schema([
                         RepeatableEntry::make('players')
                             ->schema([
-                                Grid::make(4)
+                                Grid::make(8)
                                     ->schema([
                                         ImageEntry::make('avatar_url')
                                             ->simpleLightbox()
@@ -256,10 +255,25 @@ class TournamentRegistrationResource extends Resource
                                             ->height(50),
 
                                         TextEntry::make('name')
-                                            ->weight('medium'),
-                                        TextEntry::make('date_of_birth')
+                                            ->color('primary')
                                             ->weight('medium')
-                                            ->date('jS F, Y'),
+                                            ->default('N/a'),
+                                        TextEntry::make('email')
+                                            ->color('primary')
+                                            ->weight('medium')
+                                            ->default('N/a'),
+                                        TextEntry::make('primary_contact_number')
+                                            ->label('Contact')
+                                            ->weight('medium')
+                                            ->color('primary')
+                                            ->default('N/a'),
+                                        TextEntry::make('gender')
+                                            ->formatStateUsing(fn($state) => Str::ucfirst($state))
+                                            ->weight('medium')
+                                            ->color('primary')
+                                            ->default('N/a')
+                                            ->columnSpan(2),
+
                                         Actions::make([
                                             Action::make('view')
                                                 ->label('View Details')
@@ -271,11 +285,45 @@ class TournamentRegistrationResource extends Resource
                                                     'user' => $record,
                                                     'model' => $model
                                                 ]))
-                                                ->modalWidth('xl') // Adjust the modal width as needed,
-                                                ->modalActions([])
+                                                ->modalWidth('3xl')
                                                 ->modalSubmitAction(false)
                                                 ->modalCancelAction(false)
-                                        ]),
+                                        ])
+                                            ->alignCenter()
+                                            ->columnSpan(1)
+                                            ->extraAttributes(['class' => 'flex items-center justify-center h-full']),
+                                        Section::make('Custom Fields')
+                                            ->heading('Additional Information')
+                                            ->schema([
+                                                TextEntry::make('pivot.custom_fields')
+                                                    ->label('')
+                                                    ->formatStateUsing(function (Model $player) {
+                                                        $customFields = $player->pivot->custom_fields ?? [];
+                                                        $fieldDefinitions = static::getCustomFieldDefinitions($player->pivot->tournament_registration_id);
+
+                                                        return collect($customFields)->map(function ($value, $fieldId) use ($fieldDefinitions) {
+                                                            $fieldId = (int) $fieldId;
+                                                            $field = $fieldDefinitions->get($fieldId);
+
+                                                            if (!$field) {
+                                                                return "<strong>Unknown Field (#{$fieldId}):</strong> {$value}";
+                                                            }
+
+                                                            // Handle dropdown fields
+                                                            if ($field['type'] === 'dropdown' && isset($field['options'][$value])) {
+                                                                $displayValue = $field['options'][$value];
+                                                            } else {
+                                                                $displayValue = $value;
+                                                            }
+
+                                                            return "<p> <span class='text-amber-500 capitalize'><strong>{$field['name']}:</strong></span> {$displayValue}</p>";
+                                                        })->implode('<br>');
+                                                    })
+                                                    ->html()
+                                                    ->columnSpanFull()
+                                            ])
+                                            ->collapsible()
+                                            ->columnSpanFull(),
                                     ])
                             ])
                             ->columns(1)
@@ -303,6 +351,31 @@ class TournamentRegistrationResource extends Resource
                     ])
                     ->collapsible(),
             ]);
+    }
+
+    protected static function getCustomFieldLabels(int $registrationId): array
+    {
+        $registration = TournamentRegistration::with('tournament.customFields')->find($registrationId);
+
+        return $registration->tournament->customFields
+            ->pluck('name', 'id')
+            ->toArray();
+    }
+
+    protected static function getCustomFieldDefinitions(int $registrationId)
+    {
+        $registration = TournamentRegistration::with('tournament.customFields')->findOrFail($registrationId);
+
+        return $registration->tournament->customFields->mapWithKeys(fn($field) => [
+            $field->id => [
+                'name' => $field->name,
+                'type' => $field->type,
+                'options' => $field->options ? array_combine(
+                    range(0, count(explode(',', $field->options)) - 1),
+                    explode(',', $field->options)
+                ) : null
+            ]
+        ]);
     }
 
     public static function table(Table $table): Table
