@@ -316,7 +316,11 @@ class TournamentRegistrationResource extends Resource
                                                                 $displayValue = $value;
                                                             }
 
-                                                            return "<p> <span class='text-amber-500 capitalize'><strong>{$field['name']}:</strong></span> {$displayValue}</p>";
+                                                            if ($displayValue !== null) {
+                                                                return "<p> <span class='text-amber-500 capitalize'><strong>{$field['name']}:</strong></span> {$displayValue}</p>";
+                                                            } else {
+                                                                return;
+                                                            }
                                                         })->implode('<br>');
                                                     })
                                                     ->html()
