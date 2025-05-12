@@ -320,7 +320,7 @@
                 </div>
             </div>
             <div class="mt-6 text-center text-stone-500 text-sm">
-                &copy; 2024 Vidanta Champions Arena. All rights reserved.
+                &copy; {{ now()->year }} Vidanta Champions Arena. All rights reserved.
             </div>
         </div>
     </footer>
