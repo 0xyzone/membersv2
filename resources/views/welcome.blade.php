@@ -34,6 +34,7 @@
 
     @vite('resources/css/app.css')
     <link rel="stylesheet" href="{{ asset('css/all.css') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.png') }}" type="image/x-icon">
     <style>
         @keyframes arenaGlow {
             0% {
